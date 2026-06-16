@@ -6,8 +6,8 @@ import {CTASection} from '@/components/ui/CTASection'
 function SectionHeader({title, viewAllHref}) {
   if (!title) return null
   return (
-    <div className="flex items-center justify-between mb-8">
-      <h2 className="text-2xl md:text-3xl font-bold text-slate-900">{title}</h2>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6 md:mb-8">
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">{title}</h2>
       {viewAllHref && (
         <Link href={viewAllHref} className="text-brand-600 font-medium hover:underline text-sm">
           View all →
@@ -30,14 +30,14 @@ function TopBanner({section}) {
           <div className="absolute inset-0 bg-brand-900/70" />
         </>
       )}
-      <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 max-w-3xl">{section.heading}</h1>
-        {section.text && <p className="text-xl text-brand-100 mb-8 max-w-2xl">{section.text}</p>}
+      <div className="relative max-w-7xl mx-auto px-4 py-12 md:py-24">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6 max-w-3xl">{section.heading}</h1>
+        {section.text && <p className="text-base sm:text-lg md:text-xl text-brand-100 mb-6 md:mb-8 max-w-2xl">{section.text}</p>}
         <div className="flex flex-wrap gap-4">
           {section.button1Text && section.button1Link && (
             <Link
               href={section.button1Link}
-              className="bg-white text-brand-700 px-8 py-3 rounded-lg font-semibold hover:bg-brand-50 transition-colors"
+              className="bg-white text-brand-700 px-5 sm:px-8 py-3 rounded-lg font-semibold hover:bg-brand-50 transition-colors text-sm sm:text-base"
             >
               {section.button1Text}
             </Link>
@@ -45,7 +45,7 @@ function TopBanner({section}) {
           {section.button2Text && section.button2Link && (
             <Link
               href={section.button2Link}
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-600 transition-colors"
+              className="border-2 border-white text-white px-5 sm:px-8 py-3 rounded-lg font-semibold hover:bg-brand-600 transition-colors text-sm sm:text-base"
             >
               {section.button2Text}
             </Link>

@@ -84,13 +84,6 @@ function MobileMenuItem({item, onNavigate}) {
       </button>
       {open && (
         <div className="pb-3 pl-4 space-y-2">
-          {item.href && (
-            <NavLink
-              link={item}
-              className="block text-sm text-brand-600 font-medium"
-              onClick={onNavigate}
-            />
-          )}
           {item.children.map((child) => (
             <NavLink
               key={`mobile-${item.label}-${child.href}-${child.label}`}
@@ -116,13 +109,7 @@ export function HeaderMenu({menuItems, ctaButton}) {
         ))}
       </nav>
 
-      <div className="flex items-center gap-3 lg:hidden">
-        {ctaButton?.enabled && ctaButton?.label && ctaButton?.href && (
-          <NavLink
-            link={ctaButton}
-            className="bg-brand-600 text-white px-3 py-2 rounded-lg text-xs font-semibold hover:bg-brand-700 transition-colors"
-          />
-        )}
+      <div className="flex items-center gap-2 lg:hidden ml-auto">
         <button
           type="button"
           className="p-2 rounded-lg border border-slate-200 text-slate-700"
@@ -141,8 +128,17 @@ export function HeaderMenu({menuItems, ctaButton}) {
       </div>
 
       {mobileOpen && (
-        <div className="lg:hidden border-t border-slate-100 bg-white">
-          <nav className="px-4 py-2" aria-label="Mobile navigation">
+        <div className="lg:hidden absolute inset-x-0 top-full border-t border-slate-100 bg-white shadow-lg">
+          <nav className="px-4 py-3 space-y-2" aria-label="Mobile navigation">
+            {ctaButton?.enabled && ctaButton?.label && ctaButton?.href && (
+              <div className="pb-1">
+                <NavLink
+                  link={ctaButton}
+                  className="block w-full text-center bg-brand-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-700 transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                />
+              </div>
+            )}
             {menuItems.map((item) => (
               <MobileMenuItem
                 key={`mobile-nav-${item.label}-${item.href}`}
