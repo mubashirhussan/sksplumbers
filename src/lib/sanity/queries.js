@@ -59,16 +59,21 @@ export const SITE_FOOTER_QUERY = `*[_type == "siteFooter"][0]{
 }`
 
 export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
+  heroHeading,
+  heroText,
+  "heroImage": heroImage.asset->url,
+  heroButtons[]{
+    _key,
+    label,
+    href,
+    style,
+    linkType,
+    openInNewTab
+  },
   sections[]{
     _type,
     _key,
     heading,
-    text,
-    "image": image.asset->url,
-    button1Text,
-    button1Link,
-    button2Text,
-    button2Link,
     show,
     description,
     buttonText,
@@ -100,17 +105,26 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
 }`
 
 const fallbackHomePage = {
-  sections: [
+  heroHeading: 'Professional Plumbing Services in Dubai',
+  heroText:
+    'Licensed plumbers available 24/7. Emergency repairs, water pump services, drain cleaning & more.',
+  heroButtons: [
     {
-      _type: 'homeHeroSection',
-      _key: 'hero',
-      heading: 'Professional Plumbing Services in Dubai',
-      text: 'Licensed plumbers available 24/7. Emergency repairs, water pump services, drain cleaning & more.',
-      button1Text: 'Get Free Quote',
-      button1Link: '/pages/contact',
-      button2Text: 'View All Services',
-      button2Link: '/services',
+      label: 'Get Free Quote',
+      linkType: 'internal',
+      href: '/contact',
+      style: 'primary',
+      openInNewTab: false,
     },
+    {
+      label: 'View All Services',
+      linkType: 'internal',
+      href: '/services',
+      style: 'secondary',
+      openInNewTab: false,
+    },
+  ],
+  sections: [
     {_type: 'homeServices', _key: 'services', heading: 'Our Services'},
     {_type: 'homeCategories', _key: 'categories', heading: 'Service Categories'},
     {_type: 'homeBlog', _key: 'blog', heading: 'Latest from Blog', show: true},
@@ -240,17 +254,90 @@ export async function getSiteSettings() {
 
 export async function getSiteHeader() {
   const data = await client.fetch(SITE_HEADER_QUERY, {}, REVALIDATE)
-  return data?.menuItems?.length ? data : getFallbackHeader()
+  if (!data?.menuItems?.length) return getFallbackHeader()
+  return normalizeSiteHeader(data)
 }
 
 export async function getSiteFooter() {
   const data = await client.fetch(SITE_FOOTER_QUERY, {}, REVALIDATE)
-  return data?.columns?.length ? data : getFallbackFooter()
+  if (!data?.columns?.length) return getFallbackFooter()
+  return normalizeSiteFooter(data)
+}
+
+function normalizeInternalHref(href) {
+  if (!href) return href
+  const withSlash = href.startsWith('/') ? href : `/${href}`
+  return withSlash.replace(/^\/pages\//, '/')
+}
+
+function normalizeButtonHref(href, linkType) {
+  if (!href) return href
+  if (
+    linkType === 'external' ||
+    href.startsWith('http://') ||
+    href.startsWith('https://') ||
+    href.startsWith('mailto:') ||
+    href.startsWith('tel:')
+  ) {
+    return href
+  }
+  return normalizeInternalHref(href)
+}
+
+function normalizeNavLink(link) {
+  if (!link) return link
+  return {
+    ...link,
+    href: normalizeInternalHref(link.href),
+    children: link.children?.map(normalizeNavLink),
+  }
+}
+
+function normalizeSiteHeader(data) {
+  if (!data) return data
+  return {
+    ...data,
+    menuItems: data.menuItems?.map(normalizeNavLink),
+    ctaButton: data.ctaButton?.href
+      ? {...data.ctaButton, href: normalizeInternalHref(data.ctaButton.href)}
+      : data.ctaButton,
+  }
+}
+
+function normalizeSiteFooter(data) {
+  if (!data) return data
+  return {
+    ...data,
+    columns: data.columns?.map((column) => ({
+      ...column,
+      links: column.links?.map((link) => ({
+        ...link,
+        href: normalizeInternalHref(link.href),
+      })),
+    })),
+  }
+}
+
+function normalizeHomePage(data) {
+  if (!data?.heroHeading) return fallbackHomePage
+
+  const heroButtons = (data.heroButtons || [])
+    .filter((button) => button?.label && button?.href)
+    .map((button) => ({
+      ...button,
+      href: normalizeButtonHref(button.href, button.linkType),
+    }))
+
+  return {
+    ...data,
+    heroButtons: heroButtons.length ? heroButtons : fallbackHomePage.heroButtons,
+    sections: data.sections?.length ? data.sections : fallbackHomePage.sections,
+  }
 }
 
 export async function getHomePage() {
   const data = await client.fetch(HOME_PAGE_QUERY, {}, REVALIDATE)
-  return data?.sections?.length ? data : fallbackHomePage
+  return normalizeHomePage(data)
 }
 
 export async function getServices() {

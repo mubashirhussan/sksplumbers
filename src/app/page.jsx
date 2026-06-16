@@ -30,7 +30,7 @@ export default async function HomePage() {
     <SiteLayout>
       <JsonLd data={[webSiteSchema(settings), localBusinessSchema(settings)]} />
       <HomeSections
-        sections={home.sections}
+        home={home}
         services={services}
         categories={categories}
         posts={posts}

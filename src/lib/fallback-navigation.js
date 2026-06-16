@@ -31,13 +31,13 @@ export const fallbackHeader = {
       ],
     },
     {label: 'Blog', href: '/blog/', openInNewTab: false, children: []},
-    {label: 'About', href: '/pages/about/', openInNewTab: false, children: []},
-    {label: 'Contact', href: '/pages/contact/', openInNewTab: false, children: []},
+    {label: 'About', href: '/about/', openInNewTab: false, children: []},
+    {label: 'Contact', href: '/contact/', openInNewTab: false, children: []},
   ],
   ctaButton: {
     enabled: true,
     label: 'Get a Quote',
-    href: '/pages/contact/',
+    href: '/contact/',
     openInNewTab: false,
   },
 }
@@ -54,8 +54,8 @@ export const fallbackFooter = {
         {label: 'Services', href: '/services/', openInNewTab: false},
         {label: 'Categories', href: '/categories/', openInNewTab: false},
         {label: 'Blog', href: '/blog/', openInNewTab: false},
-        {label: 'About', href: '/pages/about/', openInNewTab: false},
-        {label: 'Contact', href: '/pages/contact/', openInNewTab: false},
+        {label: 'About', href: '/about/', openInNewTab: false},
+        {label: 'Contact', href: '/contact/', openInNewTab: false},
       ],
     },
     {
@@ -71,7 +71,7 @@ export const fallbackFooter = {
     {
       title: 'Contact',
       links: [
-        {label: 'Contact Form', href: '/pages/contact/', openInNewTab: false},
+        {label: 'Contact Form', href: '/contact/', openInNewTab: false},
         {label: 'Emergency Plumber', href: '/services/emergency-plumber/', openInNewTab: false},
         {label: '24/7 Plumbing Service', href: '/services/247-plumbing-service/', openInNewTab: false},
       ],

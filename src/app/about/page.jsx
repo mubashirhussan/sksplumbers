@@ -10,7 +10,7 @@ import {getPageBySlug, getSiteSettings} from '@/lib/sanity/queries'
 
 export async function generateMetadata() {
   const page = await getPageBySlug('about')
-  return buildSeoFromDoc(page, '/pages/about', 'About SKS Plumbers Dubai')
+  return buildSeoFromDoc(page, '/about', 'About SKS Plumbers Dubai')
 }
 
 export default async function AboutPage() {
@@ -20,7 +20,7 @@ export default async function AboutPage() {
 
   const breadcrumbs = [
     {name: 'Home', path: '/'},
-    {name: 'About', path: '/pages/about'},
+    {name: 'About', path: '/about'},
   ]
 
   return (

@@ -15,7 +15,7 @@ export function CTASection({settings, title, description, buttonLabel, buttonHre
         </p>
         <div className="flex flex-wrap gap-4">
           <Link
-            href={buttonHref || '/pages/contact'}
+            href={buttonHref || '/contact'}
             className="bg-white text-brand-700 px-6 py-3 rounded-lg font-semibold hover:bg-brand-50 transition-colors"
           >
             {buttonLabel || 'Get Free Quote'}

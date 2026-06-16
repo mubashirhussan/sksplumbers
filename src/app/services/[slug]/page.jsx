@@ -100,7 +100,7 @@ export default async function ServicePage({params}) {
                 Get a free quote for {service.title.toLowerCase()} in Dubai.
               </p>
               <Link
-                href="/pages/contact"
+                href="/contact"
                 className="block text-center bg-brand-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-700 transition-colors"
               >
                 Contact Us

@@ -40,7 +40,7 @@ export default async function sitemap() {
   }))
 
   const cmsPages = pages.map((page) => ({
-    url: `${SITE_URL}/pages/${page.slug}/`,
+    url: `${SITE_URL}/${page.slug}/`,
     lastModified: page._updatedAt || new Date(),
     changeFrequency: 'yearly',
     priority: 0.5,
