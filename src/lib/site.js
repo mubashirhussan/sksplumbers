@@ -2,6 +2,8 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plumbers-du
 
 export const SITE_NAME = 'SKS Plumbers'
 
+export const SITE_LOGO = '/logo.jpeg'
+
 export const DEFAULT_SEO = {
   title: 'SKS Plumbers Dubai | 24/7 Emergency Plumbing Services',
   description:

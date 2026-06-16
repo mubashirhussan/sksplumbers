@@ -2,12 +2,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {NavLink} from '@/components/ui/NavLink'
 import {HeaderMenu} from '@/components/layout/HeaderMenu'
+import {SITE_LOGO, SITE_NAME} from '@/lib/site'
 
 export function Header({settings, header}) {
   const phone = settings?.phone
   const menuItems = header.menuItems
   const cta = header.ctaButton
-  const logoSrc = header.logoImage || settings?.logo
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
@@ -25,22 +25,14 @@ export function Header({settings, header}) {
       )}
       <div className="relative max-w-7xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-3 md:gap-4">
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          {logoSrc ? (
-            <Image
-              src={logoSrc}
-              alt={settings?.siteName || 'SKS Plumbers'}
-              width={140}
-              height={40}
-              className="h-8 md:h-10 w-auto"
-            />
-          ) : (
-            <>
-              <span className="text-xl md:text-2xl font-bold text-brand-700">{header?.logoPrimary || 'SKS'}</span>
-              {header?.logoSecondary && (
-                <span className="text-slate-700 font-medium hidden sm:inline">{header.logoSecondary}</span>
-              )}
-            </>
-          )}
+          <Image
+            src={SITE_LOGO}
+            alt={settings?.siteName || SITE_NAME}
+            width={140}
+            height={40}
+            className="h-8 md:h-10 w-auto"
+            priority
+          />
         </Link>
 
         <HeaderMenu menuItems={menuItems} ctaButton={cta} />
