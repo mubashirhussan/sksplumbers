@@ -1,31 +1,41 @@
-import Link from "next/link";
-import { client } from "@/sanity/client";
+import {SiteLayout} from '@/components/layout/SiteLayout'
+import {HomeSections} from '@/components/home/HomeSections'
+import {JsonLd} from '@/components/seo/JsonLd'
+import {buildMetadata, buildSeoFromDoc} from '@/lib/seo/metadata'
+import {localBusinessSchema, webSiteSchema} from '@/lib/seo/jsonld'
+import {getSiteSettings, getHomePage, getServices, getCategories, getPosts} from '@/lib/sanity/queries'
 
-const POSTS_QUERY = `*[  
-  _type == "post" 
-  && defined(slug.current)
-]|order(publishedAt desc)[0...12]{_id, title, slug, publishedAt}`;
+export async function generateMetadata() {
+  const [settings, home] = await Promise.all([getSiteSettings(), getHomePage()])
+  if (home?.seo?.metaTitle || home?.seo?.metaDescription) {
+    return buildSeoFromDoc(home, '/', 'SKS Plumbers Dubai')
+  }
+  return buildMetadata({
+    title: settings?.defaultSeoTitle,
+    description: settings?.defaultSeoDescription,
+    path: '/',
+  })
+}
 
-const options = { next: { revalidate: 30 } };
-
-export default async function IndexPage() {
-  const posts = await client.fetch(POSTS_QUERY, {}, options);
+export default async function HomePage() {
+  const [settings, home, services, categories, posts] = await Promise.all([
+    getSiteSettings(),
+    getHomePage(),
+    getServices(),
+    getCategories(),
+    getPosts(),
+  ])
 
   return (
-    <div>
-      <h1>Posts</h1>
-
-      {posts.map((post) => (
-        <div key={post._id}>
-          <Link href={`/${post.slug.current}`}>
-            <h2>{post.title}</h2>
-          </Link>
-
-          <p>
-            {new Date(post.publishedAt).toLocaleDateString()}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
+    <SiteLayout>
+      <JsonLd data={[webSiteSchema(settings), localBusinessSchema(settings)]} />
+      <HomeSections
+        sections={home.sections}
+        services={services}
+        categories={categories}
+        posts={posts}
+        settings={settings}
+      />
+    </SiteLayout>
+  )
 }
