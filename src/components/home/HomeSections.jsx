@@ -17,7 +17,7 @@ function SectionHeader({title, viewAllHref}) {
   )
 }
 
-function TopBanner({section}) {
+function HeroSection({section}) {
   const hasImage = Boolean(section.image)
 
   return (
@@ -57,20 +57,29 @@ function TopBanner({section}) {
 }
 
 export function HomeSections({sections, services, categories, posts, settings}) {
+  const pickItems = (selected, fallback, limit) => {
+    const chosen = (selected || []).filter(Boolean)
+    if (chosen.length) return chosen
+    return (fallback || []).slice(0, limit)
+  }
+
   return sections.map((section) => {
     const key = section._key || section._type
 
-    if (section._type === 'homeTopBanner') {
-      return <TopBanner key={key} section={section} />
+    if (section._type === 'homeHeroSection' || section._type === 'homeTopBanner') {
+      return <HeroSection key={key} section={section} />
     }
 
     if (section._type === 'homeServices') {
+      const items = pickItems(section.selectedServices, services, 6)
+      if (!items.length) return null
+
       return (
         <div key={key} className="max-w-7xl mx-auto px-4 py-12">
           <section className="mb-16">
             <SectionHeader title={section.heading} viewAllHref="/services" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {services.slice(0, 6).map((service) => (
+              {items.map((service) => (
                 <ServiceCard key={service._id} service={service} />
               ))}
             </div>
@@ -80,12 +89,15 @@ export function HomeSections({sections, services, categories, posts, settings}) 
     }
 
     if (section._type === 'homeCategories') {
+      const items = pickItems(section.selectedCategories, categories, 6)
+      if (!items.length) return null
+
       return (
         <div key={key} className="max-w-7xl mx-auto px-4">
           <section className="mb-16">
             <SectionHeader title={section.heading} viewAllHref="/categories" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categories.slice(0, 6).map((category) => (
+              {items.map((category) => (
                 <CategoryCard key={category._id} category={category} />
               ))}
             </div>
@@ -96,7 +108,7 @@ export function HomeSections({sections, services, categories, posts, settings}) 
 
     if (section._type === 'homeBlog') {
       if (section.show === false) return null
-      const items = (posts || []).slice(0, 3)
+      const items = pickItems(section.selectedPosts, posts, 3)
       if (!items.length) return null
 
       return (

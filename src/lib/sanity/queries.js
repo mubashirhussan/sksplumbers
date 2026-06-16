@@ -72,7 +72,29 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
     show,
     description,
     buttonText,
-    showPhone
+    showPhone,
+    "selectedServices": selectedServices[]->{
+      _id,
+      title,
+      slug,
+      excerpt,
+      "image": image.asset->url
+    },
+    "selectedCategories": selectedCategories[]->{
+      _id,
+      title,
+      slug,
+      description,
+      "image": image.asset->url
+    },
+    "selectedPosts": selectedPosts[]->{
+      _id,
+      title,
+      slug,
+      excerpt,
+      publishedAt,
+      "image": image.asset->url
+    }
   },
   ${seoProjection}
 }`
@@ -80,8 +102,8 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
 const fallbackHomePage = {
   sections: [
     {
-      _type: 'homeTopBanner',
-      _key: 'banner',
+      _type: 'homeHeroSection',
+      _key: 'hero',
       heading: 'Professional Plumbing Services in Dubai',
       text: 'Licensed plumbers available 24/7. Emergency repairs, water pump services, drain cleaning & more.',
       button1Text: 'Get Free Quote',
