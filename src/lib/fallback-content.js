@@ -1,3 +1,5 @@
+import {HOME_SERVICE_CARDS} from '@/lib/site-content'
+
 const BRAND_NAMES = {
   dab: 'DAB',
   davey: 'Davey',
@@ -125,11 +127,32 @@ function makeBlock(text, key) {
   }
 }
 
+function getHandymanFallbackService(slug) {
+  const card = HOME_SERVICE_CARDS.find((item) => item.slug === slug)
+  if (!card) return null
+  return {
+    _id: `fallback-service-${slug}`,
+    title: card.title,
+    slug: {current: slug},
+    excerpt: card.excerpt,
+    body: card.body.map((text, index) => makeBlock(text, `b${index + 1}`)),
+    category: null,
+    faqs: card.faqs,
+    checklist: card.checklist,
+    seo: {
+      metaTitle: `${card.title} Dubai | Handyman Maintenance`,
+      metaDescription: card.excerpt.slice(0, 160),
+    },
+  }
+}
+
 export function getFallbackService(slug) {
+  const handyman = getHandymanFallbackService(slug)
+  if (handyman) return handyman
   const catSlug = SERVICE_CATEGORY_MAP[slug]
   if (!catSlug) return null
   const title = slugToTitle(slug)
-  const excerpt = `Professional ${title.toLowerCase()} in Dubai. SKS Plumbers offers fast, licensed plumbing solutions for homes and businesses across Dubai.`
+  const excerpt = `Professional ${title.toLowerCase()} in Dubai. Handyman Maintenance offers fast, licensed plumbing solutions for homes and businesses across Dubai.`
   return {
     _id: `fallback-service-${slug}`,
     title,
@@ -141,14 +164,14 @@ export function getFallbackService(slug) {
         `Our licensed plumbers in Dubai are trained to handle all types of ${title.toLowerCase()} jobs efficiently and affordably.`,
         'b2',
       ),
-      makeBlock(`Contact SKS Plumbers today for a free quote. Same-day service available.`, 'b3'),
+      makeBlock(`Contact Handyman Maintenance today for a free quote. Same-day service available.`, 'b3'),
     ],
     category: {
       title: CATEGORY_TITLES[catSlug],
       slug: {current: catSlug},
     },
     seo: {
-      metaTitle: `${title} Dubai | SKS Plumbers`,
+      metaTitle: `${title} Dubai | Handyman Maintenance`,
       metaDescription: excerpt.slice(0, 160),
     },
   }
@@ -157,7 +180,7 @@ export function getFallbackService(slug) {
 export function getFallbackCategory(slug) {
   const title = CATEGORY_TITLES[slug]
   if (!title) return null
-  const description = `Expert ${title.toLowerCase()} in Dubai. SKS Plumbers provides reliable, affordable plumbing solutions with 24/7 emergency support.`
+  const description = `Expert ${title.toLowerCase()} in Dubai. Handyman Maintenance provides reliable, affordable plumbing solutions with 24/7 emergency support.`
   return {
     _id: `fallback-category-${slug}`,
     title,
@@ -166,12 +189,12 @@ export function getFallbackCategory(slug) {
     body: [
       makeBlock(description, 'b1'),
       makeBlock(
-        `Browse our full range of ${title.toLowerCase()} below. SKS Plumbers serves all areas of Dubai.`,
+        `Browse our full range of ${title.toLowerCase()} below. Handyman Maintenance serves all areas of Dubai.`,
         'b2',
       ),
     ],
     seo: {
-      metaTitle: `${title} Dubai | SKS Plumbers`,
+      metaTitle: `${title} Dubai | Handyman Maintenance`,
       metaDescription: description.slice(0, 160),
     },
   }
@@ -182,10 +205,10 @@ export function getFallbackPage(slug) {
     about: {
       title: 'About Us',
       excerpt:
-        'SKS Plumbers is a trusted plumbing company in Dubai, delivering professional residential and commercial plumbing services.',
+        'Handyman Maintenance is a trusted plumbing company in Dubai, delivering professional residential and commercial plumbing services.',
       body: [
         makeBlock(
-          "SKS Plumbers is one of Dubai's most trusted plumbing service providers serving residential and commercial clients.",
+          "Handyman Maintenance is one of Dubai's most trusted plumbing service providers serving residential and commercial clients.",
           'b1',
         ),
         makeBlock(
@@ -196,10 +219,10 @@ export function getFallbackPage(slug) {
     },
     contact: {
       title: 'Contact Us',
-      excerpt: 'Get in touch with SKS Plumbers for fast, reliable plumbing services in Dubai. Available 24/7.',
+      excerpt: 'Get in touch with Handyman Maintenance for fast, reliable plumbing services in Dubai. Available 24/7.',
       body: [
         makeBlock(
-          'Need a plumber in Dubai? Contact SKS Plumbers today for fast, professional service.',
+          'Need a plumber in Dubai? Contact Handyman Maintenance today for fast, professional service.',
           'b1',
         ),
         makeBlock('We serve all areas of Dubai including Dubai Marina, JLT, Downtown, and Business Bay.', 'b2'),
@@ -215,7 +238,7 @@ export function getFallbackPage(slug) {
     excerpt: page.excerpt,
     body: page.body,
     seo: {
-      metaTitle: `${page.title} | SKS Plumbers Dubai`,
+      metaTitle: `${page.title} | Handyman Maintenance Dubai`,
       metaDescription: page.excerpt.slice(0, 160),
     },
   }

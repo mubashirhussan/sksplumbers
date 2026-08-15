@@ -1,12 +1,20 @@
-import {SITE_URL, SERVICE_SLUGS, CATEGORY_SLUGS, PAGE_SLUGS} from '@/lib/site'
+import {SITE_URL, SERVICE_SLUGS, HANDYMAN_SERVICE_SLUGS, CATEGORY_SLUGS, PAGE_SLUGS, STATIC_PAGE_PATHS} from '@/lib/site'
 import {getSitemapData} from '@/lib/sanity/queries'
 
 export default async function sitemap() {
   const data = await getSitemapData().catch(() => null)
 
-  const services = data?.services?.length
+  const cmsServices = data?.services?.length
     ? data.services
     : SERVICE_SLUGS.map((slug) => ({slug, _updatedAt: new Date().toISOString()}))
+  const knownSlugs = new Set(cmsServices.map((service) => service.slug))
+  const services = [
+    ...cmsServices,
+    ...HANDYMAN_SERVICE_SLUGS.filter((slug) => !knownSlugs.has(slug)).map((slug) => ({
+      slug,
+      _updatedAt: new Date().toISOString(),
+    })),
+  ]
 
   const categories = data?.categories?.length
     ? data.categories
@@ -23,6 +31,12 @@ export default async function sitemap() {
     {url: `${SITE_URL}/blog/`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7},
     {url: `${SITE_URL}/categories/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8},
     {url: `${SITE_URL}/services/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8},
+    ...STATIC_PAGE_PATHS.map((path) => ({
+      url: `${SITE_URL}/${path}/`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })),
   ]
 
   const categoryPages = categories.map((cat) => ({

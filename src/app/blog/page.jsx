@@ -1,16 +1,17 @@
 import {SiteLayout} from '@/components/layout/SiteLayout'
 import {PostCard} from '@/components/ui/Cards'
-import {Breadcrumbs} from '@/components/ui/Breadcrumbs'
+import {PageBanner} from '@/components/ui/PageBanner'
 import {JsonLd} from '@/components/seo/JsonLd'
 import {buildMetadata} from '@/lib/seo/metadata'
 import {breadcrumbSchema} from '@/lib/seo/jsonld'
 import {getPosts} from '@/lib/sanity/queries'
+import {IMAGES} from '@/lib/images'
 
 export async function generateMetadata() {
   return buildMetadata({
-    title: 'Plumbing Blog Dubai | Tips & Guides | SKS Plumbers',
+    title: 'Plumbing Blog Dubai | Tips & Guides | Handyman Maintenance',
     description:
-      'Read plumbing tips, guides, and expert advice from SKS Plumbers Dubai. Stay informed about plumbing maintenance and repairs.',
+      'Read plumbing tips, guides, and expert advice from Handyman Maintenance Dubai. Stay informed about plumbing maintenance and repairs.',
     path: '/blog',
   })
 }
@@ -25,22 +26,18 @@ export default async function BlogPage() {
   return (
     <SiteLayout>
       <JsonLd data={breadcrumbSchema(breadcrumbs)} />
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <Breadcrumbs items={breadcrumbs} />
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Plumbing Blog</h1>
-        <p className="text-lg text-slate-600 mb-10 max-w-3xl">
-          Expert plumbing tips, guides, and news from SKS Plumbers Dubai.
-        </p>
+      <PageBanner title="Plumbing Blog" subtitle="Tips, guides, and expert advice from Handyman Maintenance Dubai" />
+      <section className="mx-auto max-w-7xl px-4 py-10 md:py-16">
         {posts?.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <PostCard key={post._id} post={post} />
+              <PostCard key={post._id} post={{...post, image: post.image || IMAGES.plumbing}} />
             ))}
           </div>
         ) : (
-          <p className="text-slate-500">No blog posts yet. Check back soon!</p>
+          <p className="text-slate-500 text-center">No blog posts yet. Check back soon!</p>
         )}
-      </div>
+      </section>
     </SiteLayout>
   )
 }

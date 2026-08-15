@@ -1,8 +1,10 @@
+import {SERVICE_MENU_ITEMS} from '@/lib/site-content'
+
 export const fallbackHeader = {
-  announcementText: '24/7 Emergency Plumbing in Dubai',
+  announcementText: '24/7 Emergency Service',
   showPhoneInBar: true,
-  logoPrimary: 'SKS',
-  logoSecondary: 'Plumbers Dubai',
+  logoPrimary: 'Handyman',
+  logoSecondary: 'Maintenance Dubai',
   logoImage: null,
   menuItems: [
     {label: 'Home', href: '/', openInNewTab: false, children: []},
@@ -10,62 +12,46 @@ export const fallbackHeader = {
       label: 'Services',
       href: '/services/',
       openInNewTab: false,
-      children: [
-        {label: 'Emergency Plumber', href: '/services/emergency-plumber/', openInNewTab: false},
-        {label: 'Water Pump Repair', href: '/services/water-pump-repair/', openInNewTab: false},
-        {label: 'Drain Unblocking', href: '/services/drain-unblocking-service/', openInNewTab: false},
-        {label: 'Water Heater Repair', href: '/services/water-heater-repair/', openInNewTab: false},
-        {label: 'View All Services', href: '/services/', openInNewTab: false},
-      ],
+      children: SERVICE_MENU_ITEMS,
     },
-    {
-      label: 'Categories',
-      href: '/categories/',
-      openInNewTab: false,
-      children: [
-        {label: 'Emergency Plumbing', href: '/categories/emergency-plumbing/', openInNewTab: false},
-        {label: 'Residential Plumbing', href: '/categories/residential-plumbing/', openInNewTab: false},
-        {label: 'Commercial Plumbing', href: '/categories/commercial-plumbing/', openInNewTab: false},
-        {label: 'Pump Services', href: '/categories/pump-services/', openInNewTab: false},
-        {label: 'Specialized Services', href: '/categories/specialized-plumbing-services/', openInNewTab: false},
-      ],
-    },
-    {label: 'Blog', href: '/blog/', openInNewTab: false, children: []},
-    {label: 'About', href: '/about/', openInNewTab: false, children: []},
-    {label: 'Contact', href: '/contact/', openInNewTab: false, children: []},
+    {label: 'About Us', href: '/about/', openInNewTab: false, children: []},
+    {label: 'Why Choose Us', href: '/why-choose-us/', openInNewTab: false, children: []},
+    {label: 'Service Areas', href: '/service-areas/', openInNewTab: false, children: []},
+    {label: 'Gallery', href: '/gallery/', openInNewTab: false, children: []},
+    {label: 'Contact Us', href: '/contact/', openInNewTab: false, children: []},
   ],
   ctaButton: {
     enabled: true,
-    label: 'Get a Quote',
+    label: 'Call Now',
     href: '/contact/',
     openInNewTab: false,
   },
 }
 
 export const fallbackFooter = {
-  brandTitle: 'SKS Plumbers Dubai',
+  brandTitle: 'Handyman Maintenance Dubai',
   description:
-    'Professional plumbing services in Dubai. Licensed plumbers available 24/7 for emergencies, repairs, and installations.',
+    'Professional handyman and maintenance services in Dubai. Plumbing, electrical, AC, painting, carpentry, and more — available 24/7.',
   columns: [
     {
       title: 'Quick Links',
       links: [
         {label: 'Home', href: '/', openInNewTab: false},
         {label: 'Services', href: '/services/', openInNewTab: false},
-        {label: 'Categories', href: '/categories/', openInNewTab: false},
-        {label: 'Blog', href: '/blog/', openInNewTab: false},
-        {label: 'About', href: '/about/', openInNewTab: false},
-        {label: 'Contact', href: '/contact/', openInNewTab: false},
+        {label: 'About Us', href: '/about/', openInNewTab: false},
+        {label: 'Why Choose Us', href: '/why-choose-us/', openInNewTab: false},
+        {label: 'Gallery', href: '/gallery/', openInNewTab: false},
+        {label: 'Contact Us', href: '/contact/', openInNewTab: false},
       ],
     },
     {
-      title: 'Service Categories',
+      title: 'Service Areas',
       links: [
+        {label: 'All Service Areas', href: '/service-areas/', openInNewTab: false},
         {label: 'Emergency Plumbing', href: '/categories/emergency-plumbing/', openInNewTab: false},
         {label: 'Residential Plumbing', href: '/categories/residential-plumbing/', openInNewTab: false},
         {label: 'Commercial Plumbing', href: '/categories/commercial-plumbing/', openInNewTab: false},
         {label: 'Pump Services', href: '/categories/pump-services/', openInNewTab: false},
-        {label: 'View All Categories', href: '/categories/', openInNewTab: false},
       ],
     },
     {
@@ -74,10 +60,11 @@ export const fallbackFooter = {
         {label: 'Contact Form', href: '/contact/', openInNewTab: false},
         {label: 'Emergency Plumber', href: '/services/emergency-plumber/', openInNewTab: false},
         {label: '24/7 Plumbing Service', href: '/services/247-plumbing-service/', openInNewTab: false},
+        {label: 'Blog', href: '/blog/', openInNewTab: false},
       ],
     },
   ],
-  copyrightText: '© {year} SKS Plumbers. All rights reserved.',
+  copyrightText: '© {year} Handyman Maintenance. All rights reserved.',
   bottomNote: 'Licensed Plumbing Services in Dubai, UAE',
 }
 

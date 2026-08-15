@@ -1,10 +1,10 @@
-import {SITE_URL} from '@/lib/site'
+import {SITE_NAME, SITE_URL} from '@/lib/site'
 
 export function localBusinessSchema(settings) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Plumber',
-    name: settings?.siteName || 'SKS Plumbers',
+    name: settings?.siteName || SITE_NAME,
     url: settings?.siteUrl || SITE_URL,
     telephone: settings?.phone,
     email: settings?.email,
@@ -38,7 +38,7 @@ export function serviceSchema(service, settings) {
     url: `${SITE_URL}/services/${service.slug.current}`,
     provider: {
       '@type': 'Plumber',
-      name: settings?.siteName || 'SKS Plumbers',
+      name: settings?.siteName || SITE_NAME,
       telephone: settings?.phone,
       url: settings?.siteUrl || SITE_URL,
     },
@@ -74,11 +74,11 @@ export function blogPostingSchema(post, settings) {
     url: `${SITE_URL}/blog/${post.slug.current}`,
     author: {
       '@type': 'Organization',
-      name: settings?.siteName || 'SKS Plumbers',
+      name: settings?.siteName || SITE_NAME,
     },
     publisher: {
       '@type': 'Organization',
-      name: settings?.siteName || 'SKS Plumbers',
+      name: settings?.siteName || SITE_NAME,
       url: settings?.siteUrl || SITE_URL,
     },
     ...(post.image && {image: post.image}),
@@ -89,7 +89,7 @@ export function webSiteSchema(settings) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: settings?.siteName || 'SKS Plumbers',
+    name: settings?.siteName || SITE_NAME,
     url: settings?.siteUrl || SITE_URL,
     description: settings?.defaultSeoDescription,
     potentialAction: {

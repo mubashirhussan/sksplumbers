@@ -1,14 +1,15 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import { SITE_URL, DEFAULT_SEO } from "@/lib/site";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const heading = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
+  weight: ["600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const body = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -16,24 +17,30 @@ export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: DEFAULT_SEO.title,
-    template: "%s | SKS Plumbers",
+    template: "%s | Handyman Maintenance",
   },
   description: DEFAULT_SEO.description,
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     locale: "en_AE",
-    siteName: "SKS Plumbers",
+    siteName: "Handyman Maintenance",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${heading.variable} ${body.variable} h-full overflow-x-hidden antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-50">{children}</body>
+      <body className="min-h-full flex flex-col overflow-x-hidden bg-white text-navy">{children}</body>
     </html>
   );
 }

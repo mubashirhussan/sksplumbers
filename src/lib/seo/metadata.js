@@ -14,7 +14,7 @@ export function buildMetadata({
   const metaTitle = title || DEFAULT_SEO.title
   const metaDescription = description || DEFAULT_SEO.description
   const url = `${SITE_URL}${path}`
-  const ogImage = getImageUrl(image) || `${SITE_URL}/og-default.jpg`
+  const ogImage = getImageUrl(image) || `${SITE_URL}/images/hero-plumber.png`
 
   return {
     title: {absolute: metaTitle},
@@ -26,7 +26,7 @@ export function buildMetadata({
       title: metaTitle,
       description: metaDescription,
       url,
-      siteName: 'SKS Plumbers',
+      siteName: 'Handyman Maintenance',
       locale: 'en_AE',
       type,
       images: [{url: ogImage, width: 1200, height: 630, alt: metaTitle}],

@@ -1,13 +1,13 @@
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://plumbers-dubai.com'
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://handymanmaintenance.com'
 
-export const SITE_NAME = 'SKS Plumbers'
+export const SITE_NAME = 'Handyman Maintenance'
 
-export const SITE_LOGO = '/logo.jpeg'
+export const SITE_LOGO = '/images/logo-mark.png'
 
 export const DEFAULT_SEO = {
-  title: 'SKS Plumbers Dubai | 24/7 Emergency Plumbing Services',
+  title: 'Handyman Maintenance Dubai | 24/7 Emergency Handyman Services',
   description:
-    'SKS Plumbers offers professional plumbing services in Dubai. Emergency plumber, water pump repair, drain cleaning, water heater services & more. Call 24/7.',
+    'Handyman Maintenance offers plumbing, electrical, AC, painting, carpentry, and tiles services in Dubai. One call for all your home, office and villa maintenance needs.',
 }
 
 export const CATEGORY_SLUGS = [
@@ -19,6 +19,15 @@ export const CATEGORY_SLUGS = [
   'specialized-plumbing-services',
 ]
 
+export const HANDYMAN_SERVICE_SLUGS = [
+  'plumbing',
+  'electrical',
+  'ac-services',
+  'painting',
+  'carpentry',
+  'tiles-gypsum',
+]
+
 export const SERVICE_SLUGS = [
   'emergency-plumber',
   'water-pump-repair',
@@ -26,6 +35,9 @@ export const SERVICE_SLUGS = [
   'water-heater-repair',
   'blocked-drain-cleaning',
   '247-plumbing-service',
+  ...HANDYMAN_SERVICE_SLUGS,
 ]
 
 export const PAGE_SLUGS = ['about', 'contact']
+
+export const STATIC_PAGE_PATHS = ['why-choose-us', 'service-areas', 'gallery']

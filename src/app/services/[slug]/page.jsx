@@ -1,9 +1,10 @@
 import {notFound} from 'next/navigation'
-import Link from 'next/link'
+import Image from 'next/image'
 import {SiteLayout} from '@/components/layout/SiteLayout'
-import {Breadcrumbs} from '@/components/ui/Breadcrumbs'
+import {PageBanner} from '@/components/ui/PageBanner'
 import {PortableText} from '@/components/content/PortableText'
-import {CTASection} from '@/components/ui/CTASection'
+import {QuoteForm} from '@/components/ui/QuoteForm'
+import {CheckBullet} from '@/components/ui/Icons'
 import {JsonLd} from '@/components/seo/JsonLd'
 import {buildSeoFromDoc} from '@/lib/seo/metadata'
 import {serviceSchema, breadcrumbSchema, faqSchema} from '@/lib/seo/jsonld'
@@ -13,6 +14,8 @@ import {
   getSiteSettings,
 } from '@/lib/sanity/queries'
 import {SERVICE_SLUGS} from '@/lib/site'
+import {withServiceImage, IMAGES} from '@/lib/images'
+import {SERVICE_CHECKLIST, WHY_CHOOSE_POINTS} from '@/lib/site-content'
 
 export async function generateStaticParams() {
   const slugs = await getServiceSlugs()
@@ -29,20 +32,25 @@ const SERVICE_FAQS = [
   {
     question: 'How quickly can you respond to plumbing emergencies in Dubai?',
     answer:
-      'SKS Plumbers offers 24/7 emergency plumbing services across Dubai with same-day response for urgent calls.',
+      'Handyman Maintenance offers 24/7 emergency plumbing services across Dubai with same-day response for urgent calls.',
   },
   {
     question: 'Are your plumbers licensed in Dubai?',
     answer:
-      'Yes, all SKS Plumbers technicians are licensed and experienced professionals serving Dubai and surrounding areas.',
+      'Yes, all Handyman Maintenance technicians are licensed and experienced professionals serving Dubai and surrounding areas.',
   },
 ]
 
 export default async function ServicePage({params}) {
   const {slug} = await params
-  const [service, settings] = await Promise.all([getServiceBySlug(slug), getSiteSettings()])
+  const [rawService, settings] = await Promise.all([getServiceBySlug(slug), getSiteSettings()])
 
-  if (!service) notFound()
+  if (!rawService) notFound()
+  const service = withServiceImage(rawService)
+  const categorySlug = service.category?.slug?.current
+  const checklist =
+    service.checklist || SERVICE_CHECKLIST[slug] || SERVICE_CHECKLIST[categorySlug] || SERVICE_CHECKLIST.default
+  const faqs = service.faqs?.length ? service.faqs : SERVICE_FAQS
 
   const breadcrumbs = [
     {name: 'Home', path: '/'},
@@ -59,31 +67,50 @@ export default async function ServicePage({params}) {
         data={[
           serviceSchema(service, settings),
           breadcrumbSchema(breadcrumbs),
-          faqSchema(SERVICE_FAQS),
+          faqSchema(faqs),
         ]}
       />
-      <article className="max-w-7xl mx-auto px-4 py-12">
-        <Breadcrumbs items={breadcrumbs} />
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{service.title}</h1>
-          {service.excerpt && (
-            <p className="text-lg text-slate-600 max-w-3xl">{service.excerpt}</p>
-          )}
-        </header>
-
+      <PageBanner title={service.title} subtitle={service.excerpt} />
+      <article className="mx-auto max-w-7xl px-4 py-10 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2">
+            <div className="relative aspect-[16/9] mb-8 overflow-hidden">
+              <Image
+                src={service.image || IMAGES.detail}
+                alt={service.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 66vw"
+              />
+            </div>
             <PortableText value={service.body} />
 
-            <section className="mt-12">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Frequently Asked Questions</h2>
+            <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mt-10 mb-5">
+              What We Cover
+            </h2>
+            <ul className="space-y-3 text-navy mb-10">
+              {checklist.map((item) => (
+                <CheckBullet key={item}>{item}</CheckBullet>
+              ))}
+            </ul>
+
+            <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-5">
+              Why Choose Us?
+            </h2>
+            <ul className="space-y-3 text-navy mb-12">
+              {WHY_CHOOSE_POINTS.map((item) => (
+                <CheckBullet key={item}>{item}</CheckBullet>
+              ))}
+            </ul>
+
+            <section>
+              <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-6">
+                Frequently Asked Questions
+              </h2>
               <div className="space-y-4">
-                {SERVICE_FAQS.map((faq) => (
-                  <details
-                    key={faq.question}
-                    className="bg-slate-50 rounded-lg p-4 border border-slate-200"
-                  >
-                    <summary className="font-semibold text-slate-900 cursor-pointer">
+                {faqs.map((faq) => (
+                  <details key={faq.question} className="bg-slate-50 p-4 border border-slate-200">
+                    <summary className="font-heading font-semibold text-navy cursor-pointer">
                       {faq.question}
                     </summary>
                     <p className="mt-3 text-slate-600 text-sm">{faq.answer}</p>
@@ -94,33 +121,18 @@ export default async function ServicePage({params}) {
           </div>
 
           <aside className="space-y-6">
-            <div className="bg-brand-50 border border-brand-200 rounded-xl p-6">
-              <h2 className="font-bold text-slate-900 mb-2">Book This Service</h2>
-              <p className="text-sm text-slate-600 mb-4">
-                Get a free quote for {service.title.toLowerCase()} in Dubai.
-              </p>
-              <Link
-                href="/contact"
-                className="block text-center bg-brand-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-700 transition-colors"
-              >
-                Contact Us
-              </Link>
+            <div className="relative aspect-[4/3] overflow-hidden">
+              <Image
+                src={IMAGES.detail}
+                alt="Handyman Maintenance technician ready to help"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 33vw"
+              />
             </div>
-            {service.category && (
-              <div className="bg-white border border-slate-200 rounded-xl p-6">
-                <h2 className="font-bold text-slate-900 mb-2">Category</h2>
-                <Link
-                  href={`/categories/${service.category.slug.current}`}
-                  className="text-brand-600 hover:underline"
-                >
-                  {service.category.title}
-                </Link>
-              </div>
-            )}
+            <QuoteForm defaultService={service.title} />
           </aside>
         </div>
-
-        <CTASection settings={settings} />
       </article>
     </SiteLayout>
   )

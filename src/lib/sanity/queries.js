@@ -1,5 +1,5 @@
 import {client} from '@/sanity/client'
-import {DEFAULT_SEO, SITE_NAME} from '@/lib/site'
+import {DEFAULT_SEO, HANDYMAN_SERVICE_SLUGS, SITE_NAME, SITE_URL, SERVICE_SLUGS} from '@/lib/site'
 import {getFallbackHeader, getFallbackFooter} from '@/lib/fallback-navigation'
 import {
   getAllFallbackServices,
@@ -9,6 +9,8 @@ import {
   getFallbackPage,
   getFallbackServicesByCategory,
 } from '@/lib/fallback-content'
+import {IMAGES, withServiceImage, withCategoryImage} from '@/lib/images'
+import {SERVICE_MENU_ITEMS} from '@/lib/site-content'
 
 export const REVALIDATE = {next: {revalidate: 60}}
 
@@ -105,21 +107,14 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
 }`
 
 const fallbackHomePage = {
-  heroHeading: 'Professional Plumbing Services in Dubai',
-  heroText:
-    'Licensed plumbers available 24/7. Emergency repairs, water pump services, drain cleaning & more.',
+  heroHeading: "Dubai's Trusted Handyman & Maintenance Experts",
+  heroText: 'One Call for All Your Home, Office & Villa Maintenance Needs.',
+  heroImage: IMAGES.hero,
   heroButtons: [
     {
-      label: 'Get Free Quote',
+      label: 'Get a Quote',
       linkType: 'internal',
       href: '/contact',
-      style: 'primary',
-      openInNewTab: false,
-    },
-    {
-      label: 'View All Services',
-      linkType: 'internal',
-      href: '/services',
       style: 'secondary',
       openInNewTab: false,
     },
@@ -133,7 +128,7 @@ const fallbackHomePage = {
       _key: 'cta',
       heading: 'Need a Plumber in Dubai?',
       description:
-        'SKS Plumbers offers fast, affordable plumbing services across Dubai. Available 24/7 for emergencies.',
+        'Handyman Maintenance offers fast, affordable plumbing services across Dubai. Available 24/7 for emergencies.',
       buttonText: 'Get Free Quote',
       showPhone: true,
     },
@@ -243,24 +238,48 @@ export const SITEMAP_QUERY = `{
 
 export async function getSiteSettings() {
   const data = await client.fetch(SITE_SETTINGS_QUERY, {}, REVALIDATE)
-  return (
-    data || {
-      siteName: SITE_NAME,
-      defaultSeoTitle: DEFAULT_SEO.title,
-      defaultSeoDescription: DEFAULT_SEO.description,
-    }
-  )
+  const defaults = {
+    siteName: SITE_NAME,
+    siteUrl: SITE_URL,
+    defaultSeoTitle: DEFAULT_SEO.title,
+    defaultSeoDescription: DEFAULT_SEO.description,
+    phone: '+971-50-000-0000',
+    email: 'info@handymanmaintenance.com',
+    address: 'Dubai, United Arab Emirates',
+    city: 'Dubai',
+  }
+  const looksLikeOldBrand = (value = '') => /sks|plumbers-dubai/i.test(value)
+  return {
+    ...defaults,
+    ...data,
+    siteName: looksLikeOldBrand(data?.siteName) ? defaults.siteName : data?.siteName || defaults.siteName,
+    siteUrl: looksLikeOldBrand(data?.siteUrl) ? defaults.siteUrl : data?.siteUrl || defaults.siteUrl,
+    phone: data?.phone || defaults.phone,
+    email: looksLikeOldBrand(data?.email) ? defaults.email : data?.email || defaults.email,
+    address: data?.address || defaults.address,
+    defaultSeoTitle: looksLikeOldBrand(data?.defaultSeoTitle)
+      ? defaults.defaultSeoTitle
+      : data?.defaultSeoTitle || defaults.defaultSeoTitle,
+    defaultSeoDescription: looksLikeOldBrand(data?.defaultSeoDescription)
+      ? defaults.defaultSeoDescription
+      : data?.defaultSeoDescription || defaults.defaultSeoDescription,
+  }
 }
 
 export async function getSiteHeader() {
   const data = await client.fetch(SITE_HEADER_QUERY, {}, REVALIDATE)
-  if (!data?.menuItems?.length) return getFallbackHeader()
+  const hrefs = (data?.menuItems || []).map((item) => item.href || '').join(' ')
+  if (!data?.menuItems?.length || !hrefs.includes('gallery')) return getFallbackHeader()
   return normalizeSiteHeader(data)
 }
 
 export async function getSiteFooter() {
   const data = await client.fetch(SITE_FOOTER_QUERY, {}, REVALIDATE)
-  if (!data?.columns?.length) return getFallbackFooter()
+  const hrefs = (data?.columns || [])
+    .flatMap((column) => column.links || [])
+    .map((link) => link.href || '')
+    .join(' ')
+  if (!data?.columns?.length || !hrefs.includes('gallery')) return getFallbackFooter()
   return normalizeSiteFooter(data)
 }
 
@@ -286,9 +305,12 @@ function normalizeButtonHref(href, linkType) {
 
 function normalizeNavLink(link) {
   if (!link) return link
+  const mappedHref = SERVICE_MENU_ITEMS.find(
+    (item) => item.label.toLowerCase() === (link.label || '').toLowerCase(),
+  )?.href
   return {
     ...link,
-    href: normalizeInternalHref(link.href),
+    href: mappedHref || normalizeInternalHref(link.href),
     children: link.children?.map(normalizeNavLink),
   }
 }
@@ -297,7 +319,14 @@ function normalizeSiteHeader(data) {
   if (!data) return data
   return {
     ...data,
-    menuItems: data.menuItems?.map(normalizeNavLink),
+    menuItems: data.menuItems?.map((item) => {
+      const link = normalizeNavLink(item)
+      const isServices = (item.label || '').toLowerCase() === 'services'
+      if (isServices) {
+        return {...link, children: SERVICE_MENU_ITEMS}
+      }
+      return link
+    }),
     ctaButton: data.ctaButton?.href
       ? {...data.ctaButton, href: normalizeInternalHref(data.ctaButton.href)}
       : data.ctaButton,
@@ -330,6 +359,9 @@ function normalizeHomePage(data) {
 
   return {
     ...data,
+    heroImage: data.heroImage || fallbackHomePage.heroImage,
+    heroHeading: data.heroHeading || fallbackHomePage.heroHeading,
+    heroText: data.heroText || fallbackHomePage.heroText,
     heroButtons: heroButtons.length ? heroButtons : fallbackHomePage.heroButtons,
     sections: data.sections?.length ? data.sections : fallbackHomePage.sections,
   }
@@ -342,27 +374,36 @@ export async function getHomePage() {
 
 export async function getServices() {
   const data = await client.fetch(SERVICES_QUERY, {}, REVALIDATE)
-  return data?.length ? data : getAllFallbackServices()
+  const list = data?.length ? data : getAllFallbackServices()
+  return list.map(withServiceImage)
 }
 
 export async function getServiceBySlug(slug) {
+  const fallback = getFallbackService(slug)
+  if (HANDYMAN_SERVICE_SLUGS.includes(slug) && fallback) {
+    return withServiceImage(fallback)
+  }
   const data = await client.fetch(SERVICE_BY_SLUG_QUERY, {slug}, REVALIDATE)
-  return data || getFallbackService(slug)
+  const service = data || fallback
+  return service ? withServiceImage(service) : service
 }
 
 export async function getServiceSlugs() {
   const slugs = await client.fetch(SERVICE_SLUGS_QUERY, {}, REVALIDATE)
-  return slugs?.length ? slugs : null
+  const base = slugs?.length ? slugs : SERVICE_SLUGS
+  return [...new Set([...base, ...HANDYMAN_SERVICE_SLUGS])]
 }
 
 export async function getCategories() {
   const data = await client.fetch(CATEGORIES_QUERY, {}, REVALIDATE)
-  return data?.length ? data : getAllFallbackCategories()
+  const list = data?.length ? data : getAllFallbackCategories()
+  return list.map(withCategoryImage)
 }
 
 export async function getCategoryBySlug(slug) {
   const data = await client.fetch(CATEGORY_BY_SLUG_QUERY, {slug}, REVALIDATE)
-  return data || getFallbackCategory(slug)
+  const category = data || getFallbackCategory(slug)
+  return category ? withCategoryImage(category) : category
 }
 
 export async function getCategorySlugs() {
@@ -372,7 +413,8 @@ export async function getCategorySlugs() {
 
 export async function getServicesByCategory(slug) {
   const data = await client.fetch(SERVICES_BY_CATEGORY_QUERY, {slug}, REVALIDATE)
-  return data?.length ? data : getFallbackServicesByCategory(slug)
+  const list = data?.length ? data : getFallbackServicesByCategory(slug)
+  return list.map(withServiceImage)
 }
 
 export async function getPosts() {

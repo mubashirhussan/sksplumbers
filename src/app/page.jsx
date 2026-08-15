@@ -3,12 +3,12 @@ import {HomeSections} from '@/components/home/HomeSections'
 import {JsonLd} from '@/components/seo/JsonLd'
 import {buildMetadata, buildSeoFromDoc} from '@/lib/seo/metadata'
 import {localBusinessSchema, webSiteSchema} from '@/lib/seo/jsonld'
-import {getSiteSettings, getHomePage, getServices, getCategories, getPosts} from '@/lib/sanity/queries'
+import {getSiteSettings, getHomePage} from '@/lib/sanity/queries'
 
 export async function generateMetadata() {
   const [settings, home] = await Promise.all([getSiteSettings(), getHomePage()])
   if (home?.seo?.metaTitle || home?.seo?.metaDescription) {
-    return buildSeoFromDoc(home, '/', 'SKS Plumbers Dubai')
+    return buildSeoFromDoc(home, '/', 'Handyman Maintenance Dubai')
   }
   return buildMetadata({
     title: settings?.defaultSeoTitle,
@@ -18,24 +18,12 @@ export async function generateMetadata() {
 }
 
 export default async function HomePage() {
-  const [settings, home, services, categories, posts] = await Promise.all([
-    getSiteSettings(),
-    getHomePage(),
-    getServices(),
-    getCategories(),
-    getPosts(),
-  ])
+  const settings = await getSiteSettings()
 
   return (
-    <SiteLayout>
+    <SiteLayout showNeedService={false}>
       <JsonLd data={[webSiteSchema(settings), localBusinessSchema(settings)]} />
-      <HomeSections
-        home={home}
-        services={services}
-        categories={categories}
-        posts={posts}
-        settings={settings}
-      />
+      <HomeSections settings={settings} />
     </SiteLayout>
   )
 }

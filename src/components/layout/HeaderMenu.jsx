@@ -1,12 +1,15 @@
 'use client'
 
-import {useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
+import {usePathname} from 'next/navigation'
 import {NavLink} from '@/components/ui/NavLink'
+import {CallButton} from '@/components/ui/CallButton'
+import {telHref} from '@/lib/contact'
 
 function Chevron({open}) {
   return (
     <svg
-      className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`}
+      className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -17,38 +20,80 @@ function Chevron({open}) {
   )
 }
 
-function DesktopMenuItem({item}) {
+function linkClass(href, pathname) {
+  const current = pathname.replace(/\/$/, '') || '/'
+  const target = (href || '/').replace(/\/$/, '') || '/'
+  const active = target === '/' ? current === '/' : current.startsWith(target)
+  return `whitespace-nowrap font-heading font-semibold uppercase text-[12px] xl:text-[13px] tracking-wide transition-colors ${
+    active ? 'text-gold' : 'text-navy hover:text-gold'
+  }`
+}
+
+function DesktopMenuItem({item, pathname}) {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef(null)
   const hasChildren = item.children?.length > 0
+  const className = linkClass(item.href, pathname)
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    function onPointerDown(event) {
+      if (!wrapRef.current?.contains(event.target)) setOpen(false)
+    }
+
+    function onKeyDown(event) {
+      if (event.key === 'Escape') setOpen(false)
+    }
+
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open])
 
   if (!hasChildren) {
-    return (
-      <NavLink
-        link={item}
-        className="text-slate-600 hover:text-brand-600 font-medium transition-colors text-sm"
-      />
-    )
+    return <NavLink link={item} className={className} />
   }
 
   return (
-    <div className="relative group">
+    <div
+      ref={wrapRef}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
       <div className="flex items-center gap-1">
         {item.href ? (
-          <NavLink
-            link={item}
-            className="text-slate-600 hover:text-brand-600 font-medium transition-colors text-sm"
-          />
+          <NavLink link={item} className={className} />
         ) : (
-          <span className="text-slate-600 font-medium text-sm cursor-default">{item.label}</span>
+          <span className={className}>{item.label}</span>
         )}
-        <Chevron open={false} />
+        <button
+          type="button"
+          className={`${className} p-0.5`}
+          aria-expanded={open}
+          aria-haspopup="true"
+          aria-label={`${open ? 'Close' : 'Open'} ${item.label} menu`}
+          onClick={() => setOpen((value) => !value)}
+        >
+          <Chevron open={open} />
+        </button>
       </div>
-      <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-        <div className="min-w-52 bg-white border border-slate-200 rounded-lg shadow-lg py-2">
+      <div
+        className={`absolute left-0 top-full z-50 pt-2 transition-all ${
+          open ? 'visible opacity-100' : 'invisible pointer-events-none opacity-0'
+        }`}
+      >
+        <div className="min-w-56 border border-slate-100 bg-white py-2 shadow-lg" role="menu">
           {item.children.map((child) => (
             <NavLink
               key={`${item.label}-${child.href}-${child.label}`}
               link={child}
-              className="block px-4 py-2 text-sm text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition-colors"
+              className="block px-4 py-2 text-sm text-navy transition-colors hover:bg-gold-100 hover:text-navy"
+              onClick={() => setOpen(false)}
             />
           ))}
         </div>
@@ -65,7 +110,7 @@ function MobileMenuItem({item, onNavigate}) {
     return (
       <NavLink
         link={item}
-        className="block py-2 text-slate-700 font-medium"
+        className="block py-2 text-navy font-heading font-semibold uppercase"
         onClick={onNavigate}
       />
     )
@@ -73,22 +118,33 @@ function MobileMenuItem({item, onNavigate}) {
 
   return (
     <div className="border-b border-slate-100 last:border-0">
-      <button
-        type="button"
-        className="flex w-full items-center justify-between py-3 text-left text-slate-700 font-medium"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
-        <span>{item.label}</span>
-        <Chevron open={open} />
-      </button>
+      <div className="flex items-center justify-between gap-2">
+        {item.href ? (
+          <NavLink
+            link={item}
+            className="flex-1 py-3 text-left text-navy font-heading font-semibold uppercase"
+            onClick={onNavigate}
+          />
+        ) : (
+          <span className="flex-1 py-3 text-navy font-heading font-semibold uppercase">{item.label}</span>
+        )}
+        <button
+          type="button"
+          className="p-2 text-navy"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-label={`${open ? 'Close' : 'Open'} ${item.label} menu`}
+        >
+          <Chevron open={open} />
+        </button>
+      </div>
       {open && (
-        <div className="pb-3 pl-4 space-y-2">
+        <div className="space-y-1 pb-3 pl-4">
           {item.children.map((child) => (
             <NavLink
               key={`mobile-${item.label}-${child.href}-${child.label}`}
               link={child}
-              className="block text-sm text-slate-600"
+              className="block py-1.5 text-sm text-slate-600 hover:text-gold"
               onClick={onNavigate}
             />
           ))}
@@ -98,26 +154,57 @@ function MobileMenuItem({item, onNavigate}) {
   )
 }
 
-export function HeaderMenu({menuItems, ctaButton}) {
+export function HeaderMenu({menuItems, phone}) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname()
+  const tel = telHref(phone)
+
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!mobileOpen) return undefined
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [mobileOpen])
 
   return (
     <>
-      <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
+      <nav className="hidden lg:flex items-center gap-3 xl:gap-5" aria-label="Main navigation">
         {menuItems.map((item) => (
-          <DesktopMenuItem key={`${item.label}-${item.href}`} item={item} />
+          <DesktopMenuItem key={`${item.label}-${item.href}`} item={item} pathname={pathname} />
         ))}
       </nav>
 
-      <div className="flex items-center gap-2 lg:hidden ml-auto">
+      <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
+        {tel && (
+          <a
+            href={tel}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-navy text-white"
+            aria-label={`Call ${phone}`}
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+              />
+            </svg>
+          </a>
+        )}
         <button
           type="button"
-          className="p-2 rounded-lg border border-slate-200 text-slate-700"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-navy"
           aria-label="Toggle menu"
           aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((v) => !v)}
+          onClick={() => setMobileOpen((value) => !value)}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             {mobileOpen ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             ) : (
@@ -128,17 +215,9 @@ export function HeaderMenu({menuItems, ctaButton}) {
       </div>
 
       {mobileOpen && (
-        <div className="lg:hidden absolute inset-x-0 top-full border-t border-slate-100 bg-white shadow-lg">
-          <nav className="px-4 py-3 space-y-2" aria-label="Mobile navigation">
-            {ctaButton?.enabled && ctaButton?.label && ctaButton?.href && (
-              <div className="pb-1">
-                <NavLink
-                  link={ctaButton}
-                  className="block w-full text-center bg-brand-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-700 transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                />
-              </div>
-            )}
+        <div className="absolute inset-x-0 top-full max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-slate-100 bg-white shadow-lg lg:hidden">
+          <nav className="space-y-2 px-4 py-3" aria-label="Mobile navigation">
+            <CallButton phone={phone} className="w-full justify-center" />
             {menuItems.map((item) => (
               <MobileMenuItem
                 key={`mobile-nav-${item.label}-${item.href}`}

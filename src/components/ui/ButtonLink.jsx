@@ -3,13 +3,13 @@ import {isExternalHref} from '@/components/ui/NavLink'
 
 const styles = {
   primary:
-    'bg-white text-brand-700 px-5 sm:px-8 py-3 rounded-lg font-semibold hover:bg-brand-50 transition-colors text-sm sm:text-base',
+    'inline-flex items-center bg-navy text-white px-6 py-3 font-heading font-extrabold uppercase text-sm hover:bg-navy-800 transition-colors',
   secondary:
-    'border-2 border-white text-white px-5 sm:px-8 py-3 rounded-lg font-semibold hover:bg-brand-600 transition-colors text-sm sm:text-base',
+    'inline-flex items-center border-2 border-navy text-navy px-6 py-3 font-heading font-extrabold uppercase text-sm hover:bg-navy hover:text-white transition-colors',
   primaryDark:
-    'bg-brand-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-700 transition-colors',
+    'inline-flex items-center bg-gold text-navy px-6 py-3 font-heading font-extrabold uppercase text-sm hover:bg-gold-600 transition-colors',
   secondaryDark:
-    'border-2 border-brand-600 text-brand-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-50 transition-colors',
+    'inline-flex items-center border-2 border-gold text-gold px-6 py-3 font-heading font-extrabold uppercase text-sm hover:bg-gold hover:text-navy transition-colors',
 }
 
 function getHref(button) {
