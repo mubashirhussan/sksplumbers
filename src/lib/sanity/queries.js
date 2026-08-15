@@ -10,9 +10,12 @@ import {
   getFallbackServicesByCategory,
 } from '@/lib/fallback-content'
 import {IMAGES, withServiceImage, withCategoryImage} from '@/lib/images'
-import {SERVICE_MENU_ITEMS} from '@/lib/site-content'
+import {SERVICE_MENU_ITEMS, HERO_TRUST} from '@/lib/site-content'
 
-export const REVALIDATE = {next: {revalidate: 60}}
+export const REVALIDATE =
+  process.env.NODE_ENV === 'production'
+    ? {next: {revalidate: 60}}
+    : {cache: 'no-store'}
 
 const seoProjection = `seo{
   metaTitle,
@@ -28,9 +31,38 @@ export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{
   defaultSeoTitle,
   defaultSeoDescription,
   phone,
+  whatsappNumber,
+  whatsappMessage,
   email,
   address,
   city,
+  workingHours,
+  callButtonLabel,
+  whatsappButtonLabel,
+  whatsappButtonSubtext,
+  quoteForm{
+    title,
+    submitLabel,
+    nameLabel,
+    phoneLabel,
+    emailLabel,
+    serviceLabel,
+    servicePlaceholder,
+    messageLabel,
+    serviceOptions
+  },
+  trustItems[]{icon, title, text},
+  howItWorksEyebrow,
+  howItWorksHeading,
+  howItWorksSteps[]{step, icon, title, text},
+  whyChooseHeading,
+  whyChoosePoints,
+  aboutStats[]{value, label},
+  serviceAreasHeading,
+  serviceAreas,
+  needServiceEyebrow,
+  needServiceHeading,
+  labels,
   "logo": logo.asset->url
 }`
 
@@ -39,6 +71,8 @@ export const SITE_HEADER_QUERY = `*[_type == "siteHeader"][0]{
   showPhoneInBar,
   logoPrimary,
   logoSecondary,
+  logoTagline,
+  hideLogoText,
   "logoImage": logoImage.asset->url,
   menuItems[]{
     label,
@@ -46,7 +80,7 @@ export const SITE_HEADER_QUERY = `*[_type == "siteHeader"][0]{
     openInNewTab,
     children[]{label, href, openInNewTab}
   },
-  ctaButton{enabled, label, href, openInNewTab}
+  ctaButton{enabled, label, href, linkType, openInNewTab}
 }`
 
 export const SITE_FOOTER_QUERY = `*[_type == "siteFooter"][0]{
@@ -61,9 +95,14 @@ export const SITE_FOOTER_QUERY = `*[_type == "siteFooter"][0]{
 }`
 
 export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
+  heroHeadingPrefix,
+  heroHeadingHighlight,
+  heroHeadingSuffix,
   heroHeading,
   heroText,
+  heroTextHighlights,
   "heroImage": heroImage.asset->url,
+  "heroImageAlt": heroImage.alt,
   heroButtons[]{
     _key,
     label,
@@ -72,6 +111,8 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
     linkType,
     openInNewTab
   },
+  heroTrust[]{icon, title, text},
+  emergencyCard{enabled, title, subtitle, badge, icon},
   sections[]{
     _type,
     _key,
@@ -79,12 +120,17 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
     show,
     description,
     buttonText,
+    buttonHref,
     showPhone,
+    viewAllLabel,
+    viewAllHref,
     "selectedServices": selectedServices[]->{
       _id,
       title,
       slug,
       excerpt,
+      icon,
+      highlights,
       "image": image.asset->url
     },
     "selectedCategories": selectedCategories[]->{
@@ -107,20 +153,40 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
 }`
 
 const fallbackHomePage = {
+  heroHeadingPrefix: "Dubai's Trusted",
+  heroHeadingHighlight: 'Handyman & Maintenance',
+  heroHeadingSuffix: 'Experts',
   heroHeading: "Dubai's Trusted Handyman & Maintenance Experts",
   heroText: 'One Call for All Your Home, Office & Villa Maintenance Needs.',
+  heroTextHighlights: ['One Call', 'Office'],
   heroImage: IMAGES.hero,
   heroButtons: [
     {
-      label: 'Get a Quote',
-      linkType: 'internal',
-      href: '/contact',
+      label: 'WhatsApp Now',
+      linkType: 'whatsapp',
+      href: '',
+      style: 'primary',
+      openInNewTab: true,
+    },
+    {
+      label: 'Call Now',
+      linkType: 'phone',
+      href: '',
       style: 'secondary',
       openInNewTab: false,
     },
   ],
+  heroTrust: HERO_TRUST,
+  emergencyCard: {
+    enabled: true,
+    title: 'Emergency Service',
+    subtitle: 'We deliver 7 days a week',
+    badge: '24/7',
+    icon: 'clock',
+  },
   sections: [
-    {_type: 'homeServices', _key: 'services', heading: 'Our Services'},
+    {_type: 'homeServices', _key: 'services', heading: 'Our Services', viewAllLabel: 'View All Services', viewAllHref: '/services/'},
+    {_type: 'homeTrust', _key: 'trust'},
     {_type: 'homeCategories', _key: 'categories', heading: 'Service Categories'},
     {_type: 'homeBlog', _key: 'blog', heading: 'Latest from Blog', show: true},
     {
@@ -140,6 +206,10 @@ export const SERVICES_QUERY = `*[_type == "service" && defined(slug.current)]|or
   title,
   slug,
   excerpt,
+  icon,
+  highlights,
+  checklist,
+  faqs[]{question, answer},
   "image": image.asset->url,
   "category": category->{title, slug},
   _updatedAt,
@@ -151,6 +221,10 @@ export const SERVICE_BY_SLUG_QUERY = `*[_type == "service" && slug.current == $s
   title,
   slug,
   excerpt,
+  icon,
+  highlights,
+  checklist,
+  faqs[]{question, answer},
   body,
   "image": image.asset->url,
   "category": category->{title, slug},
@@ -221,13 +295,35 @@ export const PAGE_BY_SLUG_QUERY = `*[_type == "page" && slug.current == $slug][0
   title,
   slug,
   excerpt,
+  bannerSubtitle,
+  eyebrow,
   body,
   "image": image.asset->url,
+  missionTitle,
+  missionText,
+  visionTitle,
+  visionText,
+  quoteFormTitle,
+  quoteFormSubmitLabel,
   _updatedAt,
   ${seoProjection}
 }`
 
 export const PAGE_SLUGS_QUERY = `*[_type == "page" && defined(slug.current)].slug.current`
+
+export const GALLERY_PAGE_QUERY = `*[_type == "galleryPage"][0]{
+  title,
+  subtitle,
+  filters[]{id, label},
+  images[]{
+    _key,
+    alt,
+    category,
+    "src": image.asset->url,
+    "imageAlt": image.alt
+  },
+  ${seoProjection}
+}`
 
 export const SITEMAP_QUERY = `{
   "services": *[_type == "service" && defined(slug.current)]{ "slug": slug.current, "_updatedAt": _updatedAt },
@@ -247,6 +343,8 @@ export async function getSiteSettings() {
     email: 'info@handymanmaintenance.com',
     address: 'Dubai, United Arab Emirates',
     city: 'Dubai',
+    workingHours: '24/7 Emergency Service',
+    whatsappMessage: 'Hello Handyman Maintenance, I need a service in Dubai.',
   }
   const looksLikeOldBrand = (value = '') => /sks|plumbers-dubai/i.test(value)
   return {
@@ -348,21 +446,30 @@ function normalizeSiteFooter(data) {
 }
 
 function normalizeHomePage(data) {
-  if (!data?.heroHeading) return fallbackHomePage
+  if (!data) return fallbackHomePage
 
   const heroButtons = (data.heroButtons || [])
-    .filter((button) => button?.label && button?.href)
+    .filter((button) => button?.label && (button?.href || button?.linkType === 'phone' || button?.linkType === 'whatsapp'))
     .map((button) => ({
       ...button,
       href: normalizeButtonHref(button.href, button.linkType),
     }))
 
   return {
+    ...fallbackHomePage,
     ...data,
     heroImage: data.heroImage || fallbackHomePage.heroImage,
+    heroHeadingPrefix: data.heroHeadingPrefix || fallbackHomePage.heroHeadingPrefix,
+    heroHeadingHighlight: data.heroHeadingHighlight || fallbackHomePage.heroHeadingHighlight,
+    heroHeadingSuffix: data.heroHeadingSuffix || fallbackHomePage.heroHeadingSuffix,
     heroHeading: data.heroHeading || fallbackHomePage.heroHeading,
     heroText: data.heroText || fallbackHomePage.heroText,
+    heroTextHighlights: data.heroTextHighlights?.length
+      ? data.heroTextHighlights
+      : fallbackHomePage.heroTextHighlights,
     heroButtons: heroButtons.length ? heroButtons : fallbackHomePage.heroButtons,
+    heroTrust: data.heroTrust?.length ? data.heroTrust : fallbackHomePage.heroTrust,
+    emergencyCard: data.emergencyCard || fallbackHomePage.emergencyCard,
     sections: data.sections?.length ? data.sections : fallbackHomePage.sections,
   }
 }
@@ -379,12 +486,8 @@ export async function getServices() {
 }
 
 export async function getServiceBySlug(slug) {
-  const fallback = getFallbackService(slug)
-  if (HANDYMAN_SERVICE_SLUGS.includes(slug) && fallback) {
-    return withServiceImage(fallback)
-  }
   const data = await client.fetch(SERVICE_BY_SLUG_QUERY, {slug}, REVALIDATE)
-  const service = data || fallback
+  const service = data || getFallbackService(slug)
   return service ? withServiceImage(service) : service
 }
 
@@ -438,6 +541,21 @@ export async function getPageBySlug(slug) {
 export async function getPageSlugs() {
   const slugs = await client.fetch(PAGE_SLUGS_QUERY, {}, REVALIDATE)
   return slugs?.length ? slugs : null
+}
+
+export async function getGalleryPage() {
+  const data = await client.fetch(GALLERY_PAGE_QUERY, {}, REVALIDATE)
+  if (!data) return data
+  const images = (data.images || [])
+    .filter((item) => item?.src)
+    .map((item) => ({
+      ...item,
+      alt: item.alt || item.imageAlt || 'Gallery image',
+    }))
+  return {
+    ...data,
+    images,
+  }
 }
 
 export async function getSitemapData() {

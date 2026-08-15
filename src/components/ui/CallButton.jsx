@@ -1,7 +1,7 @@
 import {Icon} from '@/components/ui/Icons'
 import {telHref} from '@/lib/contact'
 
-export function CallButton({phone, className = ''}) {
+export function CallButton({phone, className = '', label}) {
   const tel = telHref(phone)
   if (!tel) return null
 
@@ -12,14 +12,16 @@ export function CallButton({phone, className = ''}) {
     >
       <Icon name="phone" className="w-5 h-5 shrink-0" />
       <span className="min-w-0 text-left leading-tight">
-        <span className="block font-heading font-bold uppercase text-[11px] tracking-wide">Call Now</span>
+        <span className="block font-heading font-bold uppercase text-[11px] tracking-wide">
+          {label || 'Call Now'}
+        </span>
         <span className="block truncate font-heading text-sm font-extrabold">{phone}</span>
       </span>
     </a>
   )
 }
 
-export function WhatsAppButton({href, className = ''}) {
+export function WhatsAppButton({href, className = '', label, subtext}) {
   if (!href) return null
 
   return (
@@ -31,8 +33,10 @@ export function WhatsAppButton({href, className = ''}) {
     >
       <Icon name="whatsapp" className="w-6 h-6 shrink-0" />
       <span className="min-w-0 text-left leading-tight">
-        <span className="block font-heading font-extrabold uppercase text-sm">WhatsApp Now</span>
-        <span className="block text-[11px] font-medium opacity-90">Quick Response</span>
+        <span className="block font-heading font-extrabold uppercase text-sm">
+          {label || 'WhatsApp Now'}
+        </span>
+        <span className="block text-[11px] font-medium opacity-90">{subtext || 'Quick Response'}</span>
       </span>
     </a>
   )

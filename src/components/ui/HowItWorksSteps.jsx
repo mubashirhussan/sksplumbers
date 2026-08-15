@@ -1,10 +1,11 @@
 import {Icon} from '@/components/ui/Icons'
 import {HOW_IT_WORKS_STEPS} from '@/lib/site-content'
 
-export function HowItWorksSteps() {
+export function HowItWorksSteps({steps}) {
+  const list = steps?.length ? steps : HOW_IT_WORKS_STEPS
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-      {HOW_IT_WORKS_STEPS.map((item) => (
+      {list.map((item) => (
         <div key={item.step} className="text-center px-4">
           <div className="relative mx-auto mb-5 flex h-24 w-24 items-center justify-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-navy text-gold">

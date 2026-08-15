@@ -8,7 +8,7 @@ function formatCopyright(text) {
   return text.replace('{year}', new Date().getFullYear().toString())
 }
 
-export function Footer({settings, footer}) {
+export function Footer({settings, footer, header}) {
   const columns = footer?.columns || []
   const phone = settings?.phone
   const tel = telHref(phone)
@@ -18,7 +18,7 @@ export function Footer({settings, footer}) {
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-10 md:grid-cols-2 md:py-14 lg:grid-cols-4">
         <div>
           <div className="mb-4 inline-block rounded-md bg-white p-2">
-            <Logo />
+            <Logo header={header} />
           </div>
           <p className="mb-4 text-sm leading-relaxed text-white/70">
             {footer?.description || settings?.tagline || 'Professional handyman and maintenance services in Dubai.'}

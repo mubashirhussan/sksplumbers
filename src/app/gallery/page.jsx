@@ -2,10 +2,13 @@ import {SiteLayout} from '@/components/layout/SiteLayout'
 import {PageBanner} from '@/components/ui/PageBanner'
 import {GalleryGrid} from '@/components/gallery/GalleryGrid'
 import {JsonLd} from '@/components/seo/JsonLd'
-import {buildMetadata} from '@/lib/seo/metadata'
+import {buildMetadata, buildSeoFromDoc} from '@/lib/seo/metadata'
 import {breadcrumbSchema} from '@/lib/seo/jsonld'
+import {getGalleryPage} from '@/lib/sanity/queries'
 
 export async function generateMetadata() {
+  const page = await getGalleryPage()
+  if (page) return buildSeoFromDoc(page, '/gallery', 'Plumbing Gallery Dubai')
   return buildMetadata({
     title: 'Plumbing Gallery Dubai | Handyman Maintenance',
     description:
@@ -14,7 +17,8 @@ export async function generateMetadata() {
   })
 }
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const page = await getGalleryPage()
   const breadcrumbs = [
     {name: 'Home', path: '/'},
     {name: 'Gallery', path: '/gallery'},
@@ -23,9 +27,12 @@ export default function GalleryPage() {
   return (
     <SiteLayout>
       <JsonLd data={breadcrumbSchema(breadcrumbs)} />
-      <PageBanner title="Gallery" subtitle="Real plumbing work completed across Dubai" />
+      <PageBanner
+        title={page?.title || 'Gallery'}
+        subtitle={page?.subtitle || 'Real plumbing work completed across Dubai'}
+      />
       <section className="mx-auto max-w-7xl px-4 py-10 md:py-16">
-        <GalleryGrid />
+        <GalleryGrid filters={page?.filters} images={page?.images} />
       </section>
     </SiteLayout>
   )

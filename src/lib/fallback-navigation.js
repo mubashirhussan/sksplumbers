@@ -4,7 +4,8 @@ export const fallbackHeader = {
   announcementText: '24/7 Emergency Service',
   showPhoneInBar: true,
   logoPrimary: 'Handyman',
-  logoSecondary: 'Maintenance Dubai',
+  logoSecondary: 'Maintenance',
+  logoTagline: '- DUBAI -',
   logoImage: null,
   menuItems: [
     {label: 'Home', href: '/', openInNewTab: false, children: []},

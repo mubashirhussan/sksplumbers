@@ -27,6 +27,7 @@ const CATEGORY_TITLES = {
   'pump-services': 'Pump Services',
   'residential-plumbing': 'Residential Plumbing',
   'specialized-plumbing-services': 'Specialized Plumbing Services',
+  'home-maintenance': 'Home Maintenance',
 }
 
 const SERVICE_CATEGORY_MAP = {
@@ -139,6 +140,8 @@ function getHandymanFallbackService(slug) {
     category: null,
     faqs: card.faqs,
     checklist: card.checklist,
+    highlights: card.items,
+    icon: card.icon,
     seo: {
       metaTitle: `${card.title} Dubai | Handyman Maintenance`,
       metaDescription: card.excerpt.slice(0, 160),
@@ -204,29 +207,51 @@ export function getFallbackPage(slug) {
   const pages = {
     about: {
       title: 'About Us',
+      bannerSubtitle: "Dubai’s trusted plumbing and maintenance experts",
+      eyebrow: 'Who We Are',
       excerpt:
         'Handyman Maintenance is a trusted plumbing company in Dubai, delivering professional residential and commercial plumbing services.',
-      body: [
-        makeBlock(
-          "Handyman Maintenance is one of Dubai's most trusted plumbing service providers serving residential and commercial clients.",
-          'b1',
-        ),
-        makeBlock(
-          'Our team of licensed plumbers handles everything from routine maintenance to complex pump repairs and water heater installations.',
-          'b2',
-        ),
-      ],
+      missionTitle: 'Our Mission',
+      missionText:
+        'To provide fast, honest, and high-quality plumbing services that keep Dubai homes, offices, and villas running without disruption.',
+      visionTitle: 'Our Vision',
+      visionText:
+        'To be Dubai’s most reliable plumbing partner — known for 24/7 emergency response, skilled workmanship, and transparent pricing.',
     },
     contact: {
       title: 'Contact Us',
-      excerpt: 'Get in touch with Handyman Maintenance for fast, reliable plumbing services in Dubai. Available 24/7.',
-      body: [
-        makeBlock(
-          'Need a plumber in Dubai? Contact Handyman Maintenance today for fast, professional service.',
-          'b1',
-        ),
-        makeBlock('We serve all areas of Dubai including Dubai Marina, JLT, Downtown, and Business Bay.', 'b2'),
-      ],
+      bannerSubtitle: 'Get in touch for fast plumbing service across Dubai',
+      eyebrow: 'Get In Touch',
+      excerpt: 'Need a plumber in Dubai? Call, WhatsApp, or send a message. We are available 24/7 for emergencies.',
+      quoteFormTitle: 'Send Us a Message',
+      quoteFormSubmitLabel: 'Send Message',
+    },
+    'why-choose-us': {
+      title: 'Why Choose Us',
+      bannerSubtitle: 'A simple process and reliable plumbing you can count on',
+      eyebrow: 'Simple Process',
+      excerpt: 'See why Dubai homes and businesses choose Handyman Maintenance.',
+    },
+    'service-areas': {
+      title: 'Service Areas',
+      bannerSubtitle: 'Licensed plumbers covering homes and businesses across Dubai',
+      eyebrow: 'Dubai Coverage',
+      excerpt: 'Handyman Maintenance serves communities across Dubai.',
+    },
+    services: {
+      title: 'Our Services',
+      bannerSubtitle: 'Professional plumbing for homes, offices, and villas across Dubai',
+      excerpt: 'Browse all plumbing and maintenance services in Dubai.',
+    },
+    categories: {
+      title: 'Service Categories',
+      bannerSubtitle: 'Find the right plumbing service for your property',
+      excerpt: 'Explore plumbing service categories in Dubai.',
+    },
+    blog: {
+      title: 'Plumbing Blog',
+      bannerSubtitle: 'Tips, guides, and expert advice from Handyman Maintenance Dubai',
+      excerpt: 'Read plumbing tips, guides, and expert advice.',
     },
   }
   const page = pages[slug]
@@ -236,16 +261,32 @@ export function getFallbackPage(slug) {
     title: page.title,
     slug: {current: slug},
     excerpt: page.excerpt,
-    body: page.body,
+    bannerSubtitle: page.bannerSubtitle,
+    eyebrow: page.eyebrow,
+    missionTitle: page.missionTitle,
+    missionText: page.missionText,
+    visionTitle: page.visionTitle,
+    visionText: page.visionText,
+    quoteFormTitle: page.quoteFormTitle,
+    quoteFormSubmitLabel: page.quoteFormSubmitLabel,
+    body: page.body || [],
     seo: {
       metaTitle: `${page.title} | Handyman Maintenance Dubai`,
-      metaDescription: page.excerpt.slice(0, 160),
+      metaDescription: (page.excerpt || page.bannerSubtitle || page.title).slice(0, 160),
     },
   }
 }
 
 export function getAllFallbackServices() {
-  return Object.keys(SERVICE_CATEGORY_MAP).map((slug) => getFallbackService(slug))
+  const seen = new Set()
+  return [...HOME_SERVICE_CARDS.map((card) => card.slug), ...Object.keys(SERVICE_CATEGORY_MAP)]
+    .map((slug) => getFallbackService(slug))
+    .filter((service) => {
+      const slug = service?.slug?.current
+      if (!slug || seen.has(slug)) return false
+      seen.add(slug)
+      return true
+    })
 }
 
 export function getAllFallbackCategories() {

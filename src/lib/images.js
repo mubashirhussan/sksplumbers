@@ -121,7 +121,7 @@ export function withServiceImage(service) {
   const slug = service.slug?.current || service.slug
   return {
     ...service,
-    image: getLocalServiceImage(slug),
+    image: service.image || getLocalServiceImage(slug),
   }
 }
 
@@ -130,6 +130,6 @@ export function withCategoryImage(category) {
   const slug = category.slug?.current || category.slug
   return {
     ...category,
-    image: getLocalCategoryImage(slug),
+    image: category.image || getLocalCategoryImage(slug),
   }
 }

@@ -15,7 +15,7 @@ export async function SiteLayout({children, showNeedService = true}) {
       <Header settings={settings} header={header} />
       <main className="min-w-0 flex-1 overflow-x-hidden">{children}</main>
       {showNeedService && <NeedServiceBar settings={settings} />}
-      <Footer settings={settings} footer={footer} />
+      <Footer settings={settings} footer={footer} header={header} />
     </>
   )
 }

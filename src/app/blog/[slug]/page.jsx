@@ -1,5 +1,5 @@
 import {notFound} from 'next/navigation'
-import Image from 'next/image'
+import {CmsImage} from '@/components/ui/CmsImage'
 import {SiteLayout} from '@/components/layout/SiteLayout'
 import {PageBanner} from '@/components/ui/PageBanner'
 import {PortableText} from '@/components/content/PortableText'
@@ -46,7 +46,7 @@ export default async function BlogPostPage({params}) {
         </time>
         {post.excerpt && <p className="text-lg text-slate-600 mt-4 mb-8">{post.excerpt}</p>}
         <div className="relative aspect-[16/9] mb-8 overflow-hidden">
-          <Image
+          <CmsImage
             src={post.image || IMAGES.plumbing}
             alt={post.title}
             fill

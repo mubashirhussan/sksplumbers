@@ -1,12 +1,12 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import {CmsImage} from '@/components/ui/CmsImage'
 import {IMAGES} from '@/lib/images'
 
 function CardImage({src, alt}) {
   const image = src || IMAGES.plumbing
   return (
     <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
-      <Image src={image} alt={alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+      <CmsImage src={image} alt={alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
     </div>
   )
 }

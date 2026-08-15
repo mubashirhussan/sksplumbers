@@ -18,12 +18,12 @@ export async function generateMetadata() {
 }
 
 export default async function HomePage() {
-  const settings = await getSiteSettings()
+  const [settings, home] = await Promise.all([getSiteSettings(), getHomePage()])
 
   return (
     <SiteLayout showNeedService={false}>
       <JsonLd data={[webSiteSchema(settings), localBusinessSchema(settings)]} />
-      <HomeSections settings={settings} />
+      <HomeSections settings={settings} home={home} />
     </SiteLayout>
   )
 }

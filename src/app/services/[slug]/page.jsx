@@ -1,5 +1,5 @@
 import {notFound} from 'next/navigation'
-import Image from 'next/image'
+import {CmsImage} from '@/components/ui/CmsImage'
 import {SiteLayout} from '@/components/layout/SiteLayout'
 import {PageBanner} from '@/components/ui/PageBanner'
 import {PortableText} from '@/components/content/PortableText'
@@ -15,7 +15,7 @@ import {
 } from '@/lib/sanity/queries'
 import {SERVICE_SLUGS} from '@/lib/site'
 import {withServiceImage, IMAGES} from '@/lib/images'
-import {SERVICE_CHECKLIST, WHY_CHOOSE_POINTS} from '@/lib/site-content'
+import {SERVICE_CHECKLIST, WHY_CHOOSE_POINTS, HOME_SERVICE_CARDS} from '@/lib/site-content'
 
 export async function generateStaticParams() {
   const slugs = await getServiceSlugs()
@@ -50,7 +50,8 @@ export default async function ServicePage({params}) {
   const categorySlug = service.category?.slug?.current
   const checklist =
     service.checklist || SERVICE_CHECKLIST[slug] || SERVICE_CHECKLIST[categorySlug] || SERVICE_CHECKLIST.default
-  const faqs = service.faqs?.length ? service.faqs : SERVICE_FAQS
+  const cardFaqs = HOME_SERVICE_CARDS.find((card) => card.slug === slug)?.faqs
+  const faqs = service.faqs?.length ? service.faqs : cardFaqs || SERVICE_FAQS
 
   const breadcrumbs = [
     {name: 'Home', path: '/'},
@@ -75,7 +76,7 @@ export default async function ServicePage({params}) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2">
             <div className="relative aspect-[16/9] mb-8 overflow-hidden">
-              <Image
+              <CmsImage
                 src={service.image || IMAGES.detail}
                 alt={service.title}
                 fill
@@ -86,7 +87,7 @@ export default async function ServicePage({params}) {
             <PortableText value={service.body} />
 
             <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mt-10 mb-5">
-              What We Cover
+              {settings?.labels?.whatWeCover || 'What We Cover'}
             </h2>
             <ul className="space-y-3 text-navy mb-10">
               {checklist.map((item) => (
@@ -95,17 +96,17 @@ export default async function ServicePage({params}) {
             </ul>
 
             <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-5">
-              Why Choose Us?
+              {settings?.whyChooseHeading || 'Why Choose Us?'}
             </h2>
             <ul className="space-y-3 text-navy mb-12">
-              {WHY_CHOOSE_POINTS.map((item) => (
+              {(settings?.whyChoosePoints?.length ? settings.whyChoosePoints : WHY_CHOOSE_POINTS).map((item) => (
                 <CheckBullet key={item}>{item}</CheckBullet>
               ))}
             </ul>
 
             <section>
               <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-6">
-                Frequently Asked Questions
+                {settings?.labels?.faqHeading || 'Frequently Asked Questions'}
               </h2>
               <div className="space-y-4">
                 {faqs.map((faq) => (
@@ -122,7 +123,7 @@ export default async function ServicePage({params}) {
 
           <aside className="space-y-6">
             <div className="relative aspect-[4/3] overflow-hidden">
-              <Image
+              <CmsImage
                 src={IMAGES.detail}
                 alt="Handyman Maintenance technician ready to help"
                 fill
@@ -130,7 +131,7 @@ export default async function ServicePage({params}) {
                 sizes="(max-width: 1024px) 100vw, 33vw"
               />
             </div>
-            <QuoteForm defaultService={service.title} />
+            <QuoteForm defaultService={service.title} settings={settings} />
           </aside>
         </div>
       </article>
