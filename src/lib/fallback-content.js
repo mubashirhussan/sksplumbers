@@ -137,7 +137,10 @@ function getHandymanFallbackService(slug) {
     slug: {current: slug},
     excerpt: card.excerpt,
     body: card.body.map((text, index) => makeBlock(text, `b${index + 1}`)),
-    category: null,
+    category: {
+      title: CATEGORY_TITLES['home-maintenance'],
+      slug: {current: 'home-maintenance'},
+    },
     faqs: card.faqs,
     checklist: card.checklist,
     highlights: card.items,
@@ -294,5 +297,5 @@ export function getAllFallbackCategories() {
 }
 
 export function getFallbackServicesByCategory(categorySlug) {
-  return getAllFallbackServices().filter((s) => s.category.slug.current === categorySlug)
+  return getAllFallbackServices().filter((s) => s?.category?.slug?.current === categorySlug)
 }

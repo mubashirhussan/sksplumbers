@@ -12,9 +12,10 @@ function CardImage({src, alt}) {
 }
 
 export function ServiceCard({service}) {
+  const slug = service.slug?.current || service.slug
   return (
     <Link
-      href={`/services/${service.slug.current}`}
+      href={`/services/${slug}`}
       className="group block bg-white border border-slate-200 overflow-hidden hover:border-gold hover:shadow-md transition-all"
     >
       <CardImage src={service.image} alt={service.title} />
@@ -36,7 +37,7 @@ export function ServiceCard({service}) {
 export function CategoryCard({category}) {
   return (
     <Link
-      href={`/categories/${category.slug.current}`}
+      href={`/categories/${category.slug?.current || category.slug}`}
       className="group block bg-white border border-slate-200 overflow-hidden hover:border-gold hover:shadow-md transition-all"
     >
       <CardImage src={category.image} alt={category.title} />
@@ -58,7 +59,7 @@ export function CategoryCard({category}) {
 export function PostCard({post}) {
   return (
     <Link
-      href={`/blog/${post.slug.current}`}
+      href={`/blog/${post.slug?.current || post.slug}`}
       className="group block bg-white border border-slate-200 overflow-hidden hover:shadow-md transition-all"
     >
       <CardImage src={post.image || IMAGES.plumbing} alt={post.title} />

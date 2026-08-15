@@ -516,7 +516,7 @@ export async function getCategorySlugs() {
 
 export async function getServicesByCategory(slug) {
   const data = await client.fetch(SERVICES_BY_CATEGORY_QUERY, {slug}, REVALIDATE)
-  const list = data?.length ? data : getFallbackServicesByCategory(slug)
+  const list = Array.isArray(data) ? data : getFallbackServicesByCategory(slug)
   return list.map(withServiceImage)
 }
 
