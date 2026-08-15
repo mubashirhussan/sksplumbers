@@ -154,7 +154,7 @@ function MobileMenuItem({item, onNavigate}) {
   )
 }
 
-export function HeaderMenu({menuItems = [], phone, settings}) {
+export function HeaderMenu({menuItems, phone}) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const tel = telHref(phone)
@@ -217,7 +217,7 @@ export function HeaderMenu({menuItems = [], phone, settings}) {
       {mobileOpen && (
         <div className="absolute inset-x-0 top-full max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-slate-100 bg-white shadow-lg lg:hidden">
           <nav className="space-y-2 px-4 py-3" aria-label="Mobile navigation">
-            <CallButton phone={phone} settings={settings} className="w-full justify-center" />
+            <CallButton phone={phone} className="w-full justify-center" />
             {menuItems.map((item) => (
               <MobileMenuItem
                 key={`mobile-nav-${item.label}-${item.href}`}

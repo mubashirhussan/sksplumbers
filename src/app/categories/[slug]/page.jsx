@@ -11,30 +11,31 @@ import {
   getCategoryBySlug,
   getCategorySlugs,
   getServicesByCategory,
-  getSiteSettings,
 } from '@/lib/sanity/queries'
-import {label} from '@/lib/contact'
+import {CATEGORY_SLUGS} from '@/lib/site'
+import {withCategoryImage, withServiceImage, IMAGES} from '@/lib/images'
 
 export async function generateStaticParams() {
   const slugs = await getCategorySlugs()
-  return slugs.map((slug) => ({slug}))
+  return (slugs || CATEGORY_SLUGS).map((slug) => ({slug}))
 }
 
 export async function generateMetadata({params}) {
   const {slug} = await params
-  const [category, settings] = await Promise.all([getCategoryBySlug(slug), getSiteSettings()])
-  return buildSeoFromDoc(category, `/categories/${slug}`, settings)
+  const category = await getCategoryBySlug(slug)
+  return buildSeoFromDoc(category, `/categories/${slug}`, 'Plumbing Category Dubai')
 }
 
 export default async function CategoryPage({params}) {
   const {slug} = await params
-  const [category, services, settings] = await Promise.all([
+  const [rawCategory, rawServices] = await Promise.all([
     getCategoryBySlug(slug),
     getServicesByCategory(slug),
-    getSiteSettings(),
   ])
 
-  if (!category) notFound()
+  if (!rawCategory) notFound()
+  const category = withCategoryImage(rawCategory)
+  const services = (rawServices || []).map(withServiceImage)
 
   const breadcrumbs = [
     {name: 'Home', path: '/'},
@@ -44,33 +45,31 @@ export default async function CategoryPage({params}) {
 
   return (
     <SiteLayout>
-      <JsonLd data={breadcrumbSchema(breadcrumbs, settings)} />
+      <JsonLd data={breadcrumbSchema(breadcrumbs)} />
       <PageBanner title={category.title} subtitle={category.description} />
       <div className="mx-auto max-w-7xl px-4 py-10 md:py-16">
-        {category.image ? (
+        {category.image && (
           <div className="relative aspect-[21/8] mb-10 overflow-hidden">
             <Image
-              src={category.image}
-              alt={category.imageAlt || category.title}
+              src={category.image || IMAGES.plumbing}
+              alt={category.title}
               fill
               className="object-cover"
               sizes="100vw"
             />
           </div>
-        ) : null}
-        {category.body ? (
+        )}
+        {category.body && (
           <div className="mb-10 max-w-3xl">
             <PortableText value={category.body} />
           </div>
-        ) : null}
-        {label(settings, 'servicesInCategory') ? (
-          <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-6">
-            {label(settings, 'servicesInCategory')}
-          </h2>
-        ) : null}
+        )}
+        <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-6">
+          Services in this Category
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service) => (
-            <ServiceCard key={service._id} service={service} settings={settings} />
+            <ServiceCard key={service._id} service={service} />
           ))}
         </div>
       </div>

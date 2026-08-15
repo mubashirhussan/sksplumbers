@@ -1,6 +1,6 @@
 export function JsonLd({data}) {
   if (!data) return null
-  const schemas = (Array.isArray(data) ? data : [data]).filter(Boolean)
+  const schemas = Array.isArray(data) ? data : [data]
   return (
     <>
       {schemas.map((schema, i) => (

@@ -12,34 +12,45 @@ import {
   getServiceBySlug,
   getServiceSlugs,
   getSiteSettings,
-  getServices,
 } from '@/lib/sanity/queries'
-import {label} from '@/lib/contact'
+import {SERVICE_SLUGS} from '@/lib/site'
+import {withServiceImage, IMAGES} from '@/lib/images'
+import {SERVICE_CHECKLIST, WHY_CHOOSE_POINTS} from '@/lib/site-content'
 
 export async function generateStaticParams() {
   const slugs = await getServiceSlugs()
-  return slugs.map((slug) => ({slug}))
+  return (slugs || SERVICE_SLUGS).map((slug) => ({slug}))
 }
 
 export async function generateMetadata({params}) {
   const {slug} = await params
-  const [service, settings] = await Promise.all([getServiceBySlug(slug), getSiteSettings()])
-  return buildSeoFromDoc(service, `/services/${slug}`, settings)
+  const service = await getServiceBySlug(slug)
+  return buildSeoFromDoc(service, `/services/${slug}`, 'Plumbing Service Dubai')
 }
+
+const SERVICE_FAQS = [
+  {
+    question: 'How quickly can you respond to plumbing emergencies in Dubai?',
+    answer:
+      'Handyman Maintenance offers 24/7 emergency plumbing services across Dubai with same-day response for urgent calls.',
+  },
+  {
+    question: 'Are your plumbers licensed in Dubai?',
+    answer:
+      'Yes, all Handyman Maintenance technicians are licensed and experienced professionals serving Dubai and surrounding areas.',
+  },
+]
 
 export default async function ServicePage({params}) {
   const {slug} = await params
-  const [service, settings, services] = await Promise.all([
-    getServiceBySlug(slug),
-    getSiteSettings(),
-    getServices(),
-  ])
+  const [rawService, settings] = await Promise.all([getServiceBySlug(slug), getSiteSettings()])
 
-  if (!service) notFound()
-
-  const checklist = service.checklist || []
-  const faqs = service.faqs || []
-  const points = settings?.whyChoosePoints || []
+  if (!rawService) notFound()
+  const service = withServiceImage(rawService)
+  const categorySlug = service.category?.slug?.current
+  const checklist =
+    service.checklist || SERVICE_CHECKLIST[slug] || SERVICE_CHECKLIST[categorySlug] || SERVICE_CHECKLIST.default
+  const faqs = service.faqs?.length ? service.faqs : SERVICE_FAQS
 
   const breadcrumbs = [
     {name: 'Home', path: '/'},
@@ -55,7 +66,7 @@ export default async function ServicePage({params}) {
       <JsonLd
         data={[
           serviceSchema(service, settings),
-          breadcrumbSchema(breadcrumbs, settings),
+          breadcrumbSchema(breadcrumbs),
           faqSchema(faqs),
         ]}
       />
@@ -63,83 +74,63 @@ export default async function ServicePage({params}) {
       <article className="mx-auto max-w-7xl px-4 py-10 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2">
-            {service.image ? (
-              <div className="relative aspect-[16/9] mb-8 overflow-hidden">
-                <Image
-                  src={service.image}
-                  alt={service.imageAlt || service.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 66vw"
-                />
-              </div>
-            ) : null}
+            <div className="relative aspect-[16/9] mb-8 overflow-hidden">
+              <Image
+                src={service.image || IMAGES.detail}
+                alt={service.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 66vw"
+              />
+            </div>
             <PortableText value={service.body} />
 
-            {checklist.length ? (
-              <>
-                {label(settings, 'whatWeCover') ? (
-                  <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mt-10 mb-5">
-                    {label(settings, 'whatWeCover')}
-                  </h2>
-                ) : null}
-                <ul className="space-y-3 text-navy mb-10">
-                  {checklist.map((item) => (
-                    <CheckBullet key={item}>{item}</CheckBullet>
-                  ))}
-                </ul>
-              </>
-            ) : null}
+            <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mt-10 mb-5">
+              What We Cover
+            </h2>
+            <ul className="space-y-3 text-navy mb-10">
+              {checklist.map((item) => (
+                <CheckBullet key={item}>{item}</CheckBullet>
+              ))}
+            </ul>
 
-            {points.length ? (
-              <>
-                {settings?.whyChooseHeading ? (
-                  <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-5">
-                    {settings.whyChooseHeading}
-                  </h2>
-                ) : null}
-                <ul className="space-y-3 text-navy mb-12">
-                  {points.map((item) => (
-                    <CheckBullet key={item}>{item}</CheckBullet>
-                  ))}
-                </ul>
-              </>
-            ) : null}
+            <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-5">
+              Why Choose Us?
+            </h2>
+            <ul className="space-y-3 text-navy mb-12">
+              {WHY_CHOOSE_POINTS.map((item) => (
+                <CheckBullet key={item}>{item}</CheckBullet>
+              ))}
+            </ul>
 
-            {faqs.length ? (
-              <section>
-                {label(settings, 'faqHeading') ? (
-                  <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-6">
-                    {label(settings, 'faqHeading')}
-                  </h2>
-                ) : null}
-                <div className="space-y-4">
-                  {faqs.map((faq) => (
-                    <details key={faq.question} className="bg-slate-50 p-4 border border-slate-200">
-                      <summary className="font-heading font-semibold text-navy cursor-pointer">
-                        {faq.question}
-                      </summary>
-                      <p className="mt-3 text-slate-600 text-sm">{faq.answer}</p>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            ) : null}
+            <section>
+              <h2 className="font-heading text-2xl font-extrabold uppercase text-navy mb-6">
+                Frequently Asked Questions
+              </h2>
+              <div className="space-y-4">
+                {faqs.map((faq) => (
+                  <details key={faq.question} className="bg-slate-50 p-4 border border-slate-200">
+                    <summary className="font-heading font-semibold text-navy cursor-pointer">
+                      {faq.question}
+                    </summary>
+                    <p className="mt-3 text-slate-600 text-sm">{faq.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
           </div>
 
           <aside className="space-y-6">
-            {service.image ? (
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={service.image}
-                  alt={service.imageAlt || service.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                />
-              </div>
-            ) : null}
-            <QuoteForm settings={settings} services={services} defaultService={service.title} />
+            <div className="relative aspect-[4/3] overflow-hidden">
+              <Image
+                src={IMAGES.detail}
+                alt="Handyman Maintenance technician ready to help"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 33vw"
+              />
+            </div>
+            <QuoteForm defaultService={service.title} />
           </aside>
         </div>
       </article>

@@ -1,48 +1,68 @@
-import {getSitemapData, getSiteSettings} from '@/lib/sanity/queries'
-import {SITE_URL} from '@/lib/site'
+import {SITE_URL, SERVICE_SLUGS, HANDYMAN_SERVICE_SLUGS, CATEGORY_SLUGS, PAGE_SLUGS, STATIC_PAGE_PATHS} from '@/lib/site'
+import {getSitemapData} from '@/lib/sanity/queries'
 
 export default async function sitemap() {
-  const [data, settings] = await Promise.all([
-    getSitemapData().catch(() => null),
-    getSiteSettings().catch(() => null),
-  ])
-  const base = settings?.siteUrl || SITE_URL
-  const now = new Date()
+  const data = await getSitemapData().catch(() => null)
 
-  const staticPages = [
-    {url: base, lastModified: now, changeFrequency: 'weekly', priority: 1.0},
-    {url: `${base}/blog/`, lastModified: now, changeFrequency: 'weekly', priority: 0.7},
-    {url: `${base}/categories/`, lastModified: now, changeFrequency: 'monthly', priority: 0.8},
-    {url: `${base}/services/`, lastModified: now, changeFrequency: 'monthly', priority: 0.8},
-    {url: `${base}/gallery/`, lastModified: now, changeFrequency: 'monthly', priority: 0.7},
+  const cmsServices = data?.services?.length
+    ? data.services
+    : SERVICE_SLUGS.map((slug) => ({slug, _updatedAt: new Date().toISOString()}))
+  const knownSlugs = new Set(cmsServices.map((service) => service.slug))
+  const services = [
+    ...cmsServices,
+    ...HANDYMAN_SERVICE_SLUGS.filter((slug) => !knownSlugs.has(slug)).map((slug) => ({
+      slug,
+      _updatedAt: new Date().toISOString(),
+    })),
   ]
 
-  const categoryPages = (data?.categories || []).map((cat) => ({
-    url: `${base}/categories/${cat.slug}/`,
-    lastModified: cat._updatedAt || now,
+  const categories = data?.categories?.length
+    ? data.categories
+    : CATEGORY_SLUGS.map((slug) => ({slug, _updatedAt: new Date().toISOString()}))
+
+  const pages = data?.pages?.length
+    ? data.pages
+    : PAGE_SLUGS.map((slug) => ({slug, _updatedAt: new Date().toISOString()}))
+
+  const posts = data?.posts || []
+
+  const staticPages = [
+    {url: SITE_URL, lastModified: new Date(), changeFrequency: 'weekly', priority: 1.0},
+    {url: `${SITE_URL}/blog/`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7},
+    {url: `${SITE_URL}/categories/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8},
+    {url: `${SITE_URL}/services/`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8},
+    ...STATIC_PAGE_PATHS.map((path) => ({
+      url: `${SITE_URL}/${path}/`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })),
+  ]
+
+  const categoryPages = categories.map((cat) => ({
+    url: `${SITE_URL}/categories/${cat.slug}/`,
+    lastModified: cat._updatedAt || new Date(),
     changeFrequency: 'monthly',
     priority: 0.8,
   }))
 
-  const servicePages = (data?.services || []).map((svc) => ({
-    url: `${base}/services/${svc.slug}/`,
-    lastModified: svc._updatedAt || now,
+  const servicePages = services.map((svc) => ({
+    url: `${SITE_URL}/services/${svc.slug}/`,
+    lastModified: svc._updatedAt || new Date(),
     changeFrequency: 'monthly',
     priority: 0.8,
   }))
 
-  const cmsPages = (data?.pages || [])
-    .filter((page) => !['services', 'categories', 'blog'].includes(page.slug))
-    .map((page) => ({
-      url: `${base}/${page.slug}/`,
-      lastModified: page._updatedAt || now,
-      changeFrequency: 'yearly',
-      priority: 0.5,
-    }))
+  const cmsPages = pages.map((page) => ({
+    url: `${SITE_URL}/${page.slug}/`,
+    lastModified: page._updatedAt || new Date(),
+    changeFrequency: 'yearly',
+    priority: 0.5,
+  }))
 
-  const blogPages = (data?.posts || []).map((post) => ({
-    url: `${base}/blog/${post.slug}/`,
-    lastModified: post._updatedAt || now,
+  const blogPages = posts.map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}/`,
+    lastModified: post._updatedAt || new Date(),
     changeFrequency: 'weekly',
     priority: 0.6,
   }))

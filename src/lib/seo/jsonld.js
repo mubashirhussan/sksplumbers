@@ -1,23 +1,23 @@
+import {SITE_NAME, SITE_URL} from '@/lib/site'
+
 export function localBusinessSchema(settings) {
-  const siteName = settings?.siteName || ''
-  const siteUrl = settings?.siteUrl || ''
   return {
     '@context': 'https://schema.org',
     '@type': 'Plumber',
-    name: siteName,
-    url: siteUrl,
+    name: settings?.siteName || SITE_NAME,
+    url: settings?.siteUrl || SITE_URL,
     telephone: settings?.phone,
     email: settings?.email,
     description: settings?.defaultSeoDescription,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: settings?.city || '',
+      addressLocality: settings?.city || 'Dubai',
       addressCountry: 'AE',
       streetAddress: settings?.address,
     },
     areaServed: {
       '@type': 'City',
-      name: settings?.city || '',
+      name: 'Dubai',
     },
     priceRange: '$$',
     openingHoursSpecification: {
@@ -30,29 +30,27 @@ export function localBusinessSchema(settings) {
 }
 
 export function serviceSchema(service, settings) {
-  const siteUrl = settings?.siteUrl || ''
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: service.title,
     description: service.excerpt || service.seo?.metaDescription,
-    url: `${siteUrl}/services/${service.slug.current}`,
+    url: `${SITE_URL}/services/${service.slug.current}`,
     provider: {
       '@type': 'Plumber',
-      name: settings?.siteName,
+      name: settings?.siteName || SITE_NAME,
       telephone: settings?.phone,
-      url: siteUrl,
+      url: settings?.siteUrl || SITE_URL,
     },
     areaServed: {
       '@type': 'City',
-      name: settings?.city || '',
+      name: 'Dubai',
     },
     serviceType: service.title,
   }
 }
 
-export function breadcrumbSchema(items, settings) {
-  const siteUrl = settings?.siteUrl || ''
+export function breadcrumbSchema(items) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -60,14 +58,12 @@ export function breadcrumbSchema(items, settings) {
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: `${siteUrl}${item.path}`,
+      item: `${SITE_URL}${item.path}`,
     })),
   }
 }
 
 export function blogPostingSchema(post, settings) {
-  const siteUrl = settings?.siteUrl || ''
-  const siteName = settings?.siteName || ''
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -75,33 +71,36 @@ export function blogPostingSchema(post, settings) {
     description: post.excerpt || post.seo?.metaDescription,
     datePublished: post.publishedAt,
     dateModified: post._updatedAt || post.publishedAt,
-    url: `${siteUrl}/blog/${post.slug.current}`,
+    url: `${SITE_URL}/blog/${post.slug.current}`,
     author: {
       '@type': 'Organization',
-      name: siteName,
+      name: settings?.siteName || SITE_NAME,
     },
     publisher: {
       '@type': 'Organization',
-      name: siteName,
-      url: siteUrl,
+      name: settings?.siteName || SITE_NAME,
+      url: settings?.siteUrl || SITE_URL,
     },
     ...(post.image && {image: post.image}),
   }
 }
 
 export function webSiteSchema(settings) {
-  const siteUrl = settings?.siteUrl || ''
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: settings?.siteName,
-    url: siteUrl,
+    name: settings?.siteName || SITE_NAME,
+    url: settings?.siteUrl || SITE_URL,
     description: settings?.defaultSeoDescription,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${SITE_URL}/services?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
   }
 }
 
 export function faqSchema(faqs) {
-  if (!faqs?.length) return null
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
