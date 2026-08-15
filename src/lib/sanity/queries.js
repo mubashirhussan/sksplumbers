@@ -1,16 +1,4 @@
 import {client} from '@/sanity/client'
-import {DEFAULT_SEO, HANDYMAN_SERVICE_SLUGS, SITE_NAME, SITE_URL, SERVICE_SLUGS} from '@/lib/site'
-import {getFallbackHeader, getFallbackFooter} from '@/lib/fallback-navigation'
-import {
-  getAllFallbackServices,
-  getAllFallbackCategories,
-  getFallbackService,
-  getFallbackCategory,
-  getFallbackPage,
-  getFallbackServicesByCategory,
-} from '@/lib/fallback-content'
-import {IMAGES, withServiceImage, withCategoryImage} from '@/lib/images'
-import {SERVICE_MENU_ITEMS} from '@/lib/site-content'
 
 export const REVALIDATE = {next: {revalidate: 60}}
 
@@ -21,17 +9,51 @@ const seoProjection = `seo{
   noIndex
 }`
 
+const imageUrl = `"image": image.asset->url, "imageAlt": image.alt`
+
 export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{
   siteName,
   siteUrl,
   tagline,
-  defaultSeoTitle,
-  defaultSeoDescription,
+  "logo": logo.asset->url,
+  "logoAlt": logo.alt,
+  "defaultOgImage": defaultOgImage.asset->url,
   phone,
+  whatsappNumber,
+  whatsappMessage,
   email,
   address,
   city,
-  "logo": logo.asset->url
+  workingHours,
+  socialLinks[]{platform, url},
+  callButtonLabel,
+  whatsappButtonLabel,
+  whatsappButtonSubtext,
+  quoteForm{
+    title,
+    submitLabel,
+    nameLabel,
+    phoneLabel,
+    emailLabel,
+    serviceLabel,
+    servicePlaceholder,
+    messageLabel,
+    serviceOptions
+  },
+  trustItems[]{icon, title, text},
+  howItWorksEyebrow,
+  howItWorksHeading,
+  howItWorksSteps[]{step, icon, title, text},
+  whyChooseHeading,
+  whyChoosePoints,
+  aboutStats[]{value, label},
+  serviceAreasHeading,
+  serviceAreas,
+  needServiceEyebrow,
+  needServiceHeading,
+  labels,
+  defaultSeoTitle,
+  defaultSeoDescription
 }`
 
 export const SITE_HEADER_QUERY = `*[_type == "siteHeader"][0]{
@@ -39,14 +61,17 @@ export const SITE_HEADER_QUERY = `*[_type == "siteHeader"][0]{
   showPhoneInBar,
   logoPrimary,
   logoSecondary,
+  logoTagline,
   "logoImage": logoImage.asset->url,
+  "logoImageAlt": logoImage.alt,
+  hideLogoText,
   menuItems[]{
     label,
     href,
     openInNewTab,
     children[]{label, href, openInNewTab}
   },
-  ctaButton{enabled, label, href, openInNewTab}
+  ctaButton{enabled, label, href, linkType, openInNewTab}
 }`
 
 export const SITE_FOOTER_QUERY = `*[_type == "siteFooter"][0]{
@@ -60,10 +85,13 @@ export const SITE_FOOTER_QUERY = `*[_type == "siteFooter"][0]{
   bottomNote
 }`
 
+const serviceCardProjection = `_id, title, slug, excerpt, icon, highlights, ${imageUrl}, "category": category->{title, slug}`
+
 export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
   heroHeading,
   heroText,
   "heroImage": heroImage.asset->url,
+  "heroImageAlt": heroImage.alt,
   heroButtons[]{
     _key,
     label,
@@ -72,6 +100,8 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
     linkType,
     openInNewTab
   },
+  heroTrust[]{icon, title, text},
+  emergencyCard{enabled, title, subtitle, badge, icon},
   sections[]{
     _type,
     _key,
@@ -79,69 +109,23 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
     show,
     description,
     buttonText,
+    buttonHref,
     showPhone,
-    "selectedServices": selectedServices[]->{
-      _id,
-      title,
-      slug,
-      excerpt,
-      "image": image.asset->url
-    },
+    viewAllLabel,
+    viewAllHref,
+    "selectedServices": selectedServices[]->{${serviceCardProjection}},
     "selectedCategories": selectedCategories[]->{
-      _id,
-      title,
-      slug,
-      description,
-      "image": image.asset->url
+      _id, title, slug, description, ${imageUrl}
     },
     "selectedPosts": selectedPosts[]->{
-      _id,
-      title,
-      slug,
-      excerpt,
-      publishedAt,
-      "image": image.asset->url
+      _id, title, slug, excerpt, publishedAt, ${imageUrl}
     }
   },
   ${seoProjection}
 }`
 
-const fallbackHomePage = {
-  heroHeading: "Dubai's Trusted Handyman & Maintenance Experts",
-  heroText: 'One Call for All Your Home, Office & Villa Maintenance Needs.',
-  heroImage: IMAGES.hero,
-  heroButtons: [
-    {
-      label: 'Get a Quote',
-      linkType: 'internal',
-      href: '/contact',
-      style: 'secondary',
-      openInNewTab: false,
-    },
-  ],
-  sections: [
-    {_type: 'homeServices', _key: 'services', heading: 'Our Services'},
-    {_type: 'homeCategories', _key: 'categories', heading: 'Service Categories'},
-    {_type: 'homeBlog', _key: 'blog', heading: 'Latest from Blog', show: true},
-    {
-      _type: 'homeContactBanner',
-      _key: 'cta',
-      heading: 'Need a Plumber in Dubai?',
-      description:
-        'Handyman Maintenance offers fast, affordable plumbing services across Dubai. Available 24/7 for emergencies.',
-      buttonText: 'Get Free Quote',
-      showPhone: true,
-    },
-  ],
-}
-
 export const SERVICES_QUERY = `*[_type == "service" && defined(slug.current)]|order(title asc){
-  _id,
-  title,
-  slug,
-  excerpt,
-  "image": image.asset->url,
-  "category": category->{title, slug},
+  ${serviceCardProjection},
   _updatedAt,
   ${seoProjection}
 }`
@@ -151,8 +135,12 @@ export const SERVICE_BY_SLUG_QUERY = `*[_type == "service" && slug.current == $s
   title,
   slug,
   excerpt,
+  icon,
+  highlights,
+  checklist,
+  faqs[]{question, answer},
   body,
-  "image": image.asset->url,
+  ${imageUrl},
   "category": category->{title, slug},
   _updatedAt,
   ${seoProjection}
@@ -161,57 +149,25 @@ export const SERVICE_BY_SLUG_QUERY = `*[_type == "service" && slug.current == $s
 export const SERVICE_SLUGS_QUERY = `*[_type == "service" && defined(slug.current)].slug.current`
 
 export const CATEGORIES_QUERY = `*[_type == "category" && defined(slug.current)]|order(title asc){
-  _id,
-  title,
-  slug,
-  description,
-  "image": image.asset->url,
-  _updatedAt,
-  ${seoProjection}
+  _id, title, slug, description, ${imageUrl}, _updatedAt, ${seoProjection}
 }`
 
 export const CATEGORY_BY_SLUG_QUERY = `*[_type == "category" && slug.current == $slug][0]{
-  _id,
-  title,
-  slug,
-  description,
-  body,
-  "image": image.asset->url,
-  _updatedAt,
-  ${seoProjection}
+  _id, title, slug, description, body, ${imageUrl}, _updatedAt, ${seoProjection}
 }`
 
 export const CATEGORY_SLUGS_QUERY = `*[_type == "category" && defined(slug.current)].slug.current`
 
 export const SERVICES_BY_CATEGORY_QUERY = `*[_type == "service" && category->slug.current == $slug]|order(title asc){
-  _id,
-  title,
-  slug,
-  excerpt,
-  "image": image.asset->url
+  ${serviceCardProjection}
 }`
 
 export const POSTS_QUERY = `*[_type == "post" && defined(slug.current)]|order(publishedAt desc){
-  _id,
-  title,
-  slug,
-  excerpt,
-  publishedAt,
-  "image": image.asset->url,
-  _updatedAt,
-  ${seoProjection}
+  _id, title, slug, excerpt, publishedAt, ${imageUrl}, _updatedAt, ${seoProjection}
 }`
 
 export const POST_BY_SLUG_QUERY = `*[_type == "post" && slug.current == $slug][0]{
-  _id,
-  title,
-  slug,
-  excerpt,
-  body,
-  publishedAt,
-  "image": image.asset->url,
-  _updatedAt,
-  ${seoProjection}
+  _id, title, slug, excerpt, body, publishedAt, ${imageUrl}, _updatedAt, ${seoProjection}
 }`
 
 export const POST_SLUGS_QUERY = `*[_type == "post" && defined(slug.current)].slug.current`
@@ -221,13 +177,35 @@ export const PAGE_BY_SLUG_QUERY = `*[_type == "page" && slug.current == $slug][0
   title,
   slug,
   excerpt,
+  bannerSubtitle,
+  eyebrow,
   body,
-  "image": image.asset->url,
+  ${imageUrl},
+  missionTitle,
+  missionText,
+  visionTitle,
+  visionText,
+  quoteFormTitle,
+  quoteFormSubmitLabel,
   _updatedAt,
   ${seoProjection}
 }`
 
 export const PAGE_SLUGS_QUERY = `*[_type == "page" && defined(slug.current)].slug.current`
+
+export const GALLERY_PAGE_QUERY = `*[_type == "galleryPage"][0]{
+  title,
+  subtitle,
+  filters[]{id, label},
+  images[]{
+    _key,
+    alt,
+    category,
+    "src": image.asset->url,
+    "imageAlt": image.alt
+  },
+  ${seoProjection}
+}`
 
 export const SITEMAP_QUERY = `{
   "services": *[_type == "service" && defined(slug.current)]{ "slug": slug.current, "_updatedAt": _updatedAt },
@@ -235,53 +213,6 @@ export const SITEMAP_QUERY = `{
   "posts": *[_type == "post" && defined(slug.current)]{ "slug": slug.current, "_updatedAt": _updatedAt },
   "pages": *[_type == "page" && defined(slug.current)]{ "slug": slug.current, "_updatedAt": _updatedAt }
 }`
-
-export async function getSiteSettings() {
-  const data = await client.fetch(SITE_SETTINGS_QUERY, {}, REVALIDATE)
-  const defaults = {
-    siteName: SITE_NAME,
-    siteUrl: SITE_URL,
-    defaultSeoTitle: DEFAULT_SEO.title,
-    defaultSeoDescription: DEFAULT_SEO.description,
-    phone: '+971-50-000-0000',
-    email: 'info@handymanmaintenance.com',
-    address: 'Dubai, United Arab Emirates',
-    city: 'Dubai',
-  }
-  const looksLikeOldBrand = (value = '') => /sks|plumbers-dubai/i.test(value)
-  return {
-    ...defaults,
-    ...data,
-    siteName: looksLikeOldBrand(data?.siteName) ? defaults.siteName : data?.siteName || defaults.siteName,
-    siteUrl: looksLikeOldBrand(data?.siteUrl) ? defaults.siteUrl : data?.siteUrl || defaults.siteUrl,
-    phone: data?.phone || defaults.phone,
-    email: looksLikeOldBrand(data?.email) ? defaults.email : data?.email || defaults.email,
-    address: data?.address || defaults.address,
-    defaultSeoTitle: looksLikeOldBrand(data?.defaultSeoTitle)
-      ? defaults.defaultSeoTitle
-      : data?.defaultSeoTitle || defaults.defaultSeoTitle,
-    defaultSeoDescription: looksLikeOldBrand(data?.defaultSeoDescription)
-      ? defaults.defaultSeoDescription
-      : data?.defaultSeoDescription || defaults.defaultSeoDescription,
-  }
-}
-
-export async function getSiteHeader() {
-  const data = await client.fetch(SITE_HEADER_QUERY, {}, REVALIDATE)
-  const hrefs = (data?.menuItems || []).map((item) => item.href || '').join(' ')
-  if (!data?.menuItems?.length || !hrefs.includes('gallery')) return getFallbackHeader()
-  return normalizeSiteHeader(data)
-}
-
-export async function getSiteFooter() {
-  const data = await client.fetch(SITE_FOOTER_QUERY, {}, REVALIDATE)
-  const hrefs = (data?.columns || [])
-    .flatMap((column) => column.links || [])
-    .map((link) => link.href || '')
-    .join(' ')
-  if (!data?.columns?.length || !hrefs.includes('gallery')) return getFallbackFooter()
-  return normalizeSiteFooter(data)
-}
 
 function normalizeInternalHref(href) {
   if (!href) return href
@@ -293,6 +224,8 @@ function normalizeButtonHref(href, linkType) {
   if (!href) return href
   if (
     linkType === 'external' ||
+    linkType === 'phone' ||
+    linkType === 'whatsapp' ||
     href.startsWith('http://') ||
     href.startsWith('https://') ||
     href.startsWith('mailto:') ||
@@ -305,36 +238,32 @@ function normalizeButtonHref(href, linkType) {
 
 function normalizeNavLink(link) {
   if (!link) return link
-  const mappedHref = SERVICE_MENU_ITEMS.find(
-    (item) => item.label.toLowerCase() === (link.label || '').toLowerCase(),
-  )?.href
   return {
     ...link,
-    href: mappedHref || normalizeInternalHref(link.href),
+    href: normalizeInternalHref(link.href),
     children: link.children?.map(normalizeNavLink),
   }
 }
 
-function normalizeSiteHeader(data) {
-  if (!data) return data
+export async function getSiteSettings() {
+  return (await client.fetch(SITE_SETTINGS_QUERY, {}, REVALIDATE)) || {}
+}
+
+export async function getSiteHeader() {
+  const data = await client.fetch(SITE_HEADER_QUERY, {}, REVALIDATE)
+  if (!data) return {menuItems: []}
   return {
     ...data,
-    menuItems: data.menuItems?.map((item) => {
-      const link = normalizeNavLink(item)
-      const isServices = (item.label || '').toLowerCase() === 'services'
-      if (isServices) {
-        return {...link, children: SERVICE_MENU_ITEMS}
-      }
-      return link
-    }),
+    menuItems: data.menuItems?.map(normalizeNavLink) || [],
     ctaButton: data.ctaButton?.href
       ? {...data.ctaButton, href: normalizeInternalHref(data.ctaButton.href)}
       : data.ctaButton,
   }
 }
 
-function normalizeSiteFooter(data) {
-  if (!data) return data
+export async function getSiteFooter() {
+  const data = await client.fetch(SITE_FOOTER_QUERY, {}, REVALIDATE)
+  if (!data) return {columns: []}
   return {
     ...data,
     columns: data.columns?.map((column) => ({
@@ -347,78 +276,79 @@ function normalizeSiteFooter(data) {
   }
 }
 
-function normalizeHomePage(data) {
-  if (!data?.heroHeading) return fallbackHomePage
+async function hydrateHomeSections(home) {
+  if (!home?.sections?.length) return home
 
-  const heroButtons = (data.heroButtons || [])
-    .filter((button) => button?.label && button?.href)
-    .map((button) => ({
-      ...button,
-      href: normalizeButtonHref(button.href, button.linkType),
-    }))
+  let sections = await Promise.all(
+    home.sections.map(async (section) => {
+      if (section._type === 'homeServices' && !section.selectedServices?.length) {
+        const services = await getServices()
+        return {...section, selectedServices: (services || []).slice(0, 6)}
+      }
+      if (section._type === 'homeCategories' && !section.selectedCategories?.length) {
+        const categories = await getCategories()
+        return {...section, selectedCategories: (categories || []).slice(0, 6)}
+      }
+      if (section._type === 'homeBlog' && section.show !== false && !section.selectedPosts?.length) {
+        const posts = await getPosts()
+        return {...section, selectedPosts: (posts || []).slice(0, 3)}
+      }
+      return section
+    }),
+  )
 
-  return {
-    ...data,
-    heroImage: data.heroImage || fallbackHomePage.heroImage,
-    heroHeading: data.heroHeading || fallbackHomePage.heroHeading,
-    heroText: data.heroText || fallbackHomePage.heroText,
-    heroButtons: heroButtons.length ? heroButtons : fallbackHomePage.heroButtons,
-    sections: data.sections?.length ? data.sections : fallbackHomePage.sections,
+  if (!sections.some((section) => section._type === 'homeTrust')) {
+    const idx = sections.findIndex((section) => section._type === 'homeServices')
+    const insertAt = idx >= 0 ? idx + 1 : sections.length
+    sections = [...sections]
+    sections.splice(insertAt, 0, {_type: 'homeTrust', _key: 'trust-auto'})
   }
+
+  return {...home, sections}
 }
 
 export async function getHomePage() {
   const data = await client.fetch(HOME_PAGE_QUERY, {}, REVALIDATE)
-  return normalizeHomePage(data)
+  if (!data) return null
+  const heroButtons = (data.heroButtons || [])
+    .filter((button) => button?.label && (button?.href || button?.linkType === 'phone' || button?.linkType === 'whatsapp'))
+    .map((button) => ({
+      ...button,
+      href: normalizeButtonHref(button.href, button.linkType),
+    }))
+  return hydrateHomeSections({...data, heroButtons})
 }
 
 export async function getServices() {
-  const data = await client.fetch(SERVICES_QUERY, {}, REVALIDATE)
-  const list = data?.length ? data : getAllFallbackServices()
-  return list.map(withServiceImage)
+  return (await client.fetch(SERVICES_QUERY, {}, REVALIDATE)) || []
 }
 
 export async function getServiceBySlug(slug) {
-  const fallback = getFallbackService(slug)
-  if (HANDYMAN_SERVICE_SLUGS.includes(slug) && fallback) {
-    return withServiceImage(fallback)
-  }
-  const data = await client.fetch(SERVICE_BY_SLUG_QUERY, {slug}, REVALIDATE)
-  const service = data || fallback
-  return service ? withServiceImage(service) : service
+  return client.fetch(SERVICE_BY_SLUG_QUERY, {slug}, REVALIDATE)
 }
 
 export async function getServiceSlugs() {
-  const slugs = await client.fetch(SERVICE_SLUGS_QUERY, {}, REVALIDATE)
-  const base = slugs?.length ? slugs : SERVICE_SLUGS
-  return [...new Set([...base, ...HANDYMAN_SERVICE_SLUGS])]
+  return (await client.fetch(SERVICE_SLUGS_QUERY, {}, REVALIDATE)) || []
 }
 
 export async function getCategories() {
-  const data = await client.fetch(CATEGORIES_QUERY, {}, REVALIDATE)
-  const list = data?.length ? data : getAllFallbackCategories()
-  return list.map(withCategoryImage)
+  return (await client.fetch(CATEGORIES_QUERY, {}, REVALIDATE)) || []
 }
 
 export async function getCategoryBySlug(slug) {
-  const data = await client.fetch(CATEGORY_BY_SLUG_QUERY, {slug}, REVALIDATE)
-  const category = data || getFallbackCategory(slug)
-  return category ? withCategoryImage(category) : category
+  return client.fetch(CATEGORY_BY_SLUG_QUERY, {slug}, REVALIDATE)
 }
 
 export async function getCategorySlugs() {
-  const slugs = await client.fetch(CATEGORY_SLUGS_QUERY, {}, REVALIDATE)
-  return slugs?.length ? slugs : null
+  return (await client.fetch(CATEGORY_SLUGS_QUERY, {}, REVALIDATE)) || []
 }
 
 export async function getServicesByCategory(slug) {
-  const data = await client.fetch(SERVICES_BY_CATEGORY_QUERY, {slug}, REVALIDATE)
-  const list = data?.length ? data : getFallbackServicesByCategory(slug)
-  return list.map(withServiceImage)
+  return (await client.fetch(SERVICES_BY_CATEGORY_QUERY, {slug}, REVALIDATE)) || []
 }
 
 export async function getPosts() {
-  return client.fetch(POSTS_QUERY, {}, REVALIDATE)
+  return (await client.fetch(POSTS_QUERY, {}, REVALIDATE)) || []
 }
 
 export async function getPostBySlug(slug) {
@@ -426,18 +356,19 @@ export async function getPostBySlug(slug) {
 }
 
 export async function getPostSlugs() {
-  const slugs = await client.fetch(POST_SLUGS_QUERY, {}, REVALIDATE)
-  return slugs?.length ? slugs : null
+  return (await client.fetch(POST_SLUGS_QUERY, {}, REVALIDATE)) || []
 }
 
 export async function getPageBySlug(slug) {
-  const data = await client.fetch(PAGE_BY_SLUG_QUERY, {slug}, REVALIDATE)
-  return data || getFallbackPage(slug)
+  return client.fetch(PAGE_BY_SLUG_QUERY, {slug}, REVALIDATE)
 }
 
 export async function getPageSlugs() {
-  const slugs = await client.fetch(PAGE_SLUGS_QUERY, {}, REVALIDATE)
-  return slugs?.length ? slugs : null
+  return (await client.fetch(PAGE_SLUGS_QUERY, {}, REVALIDATE)) || []
+}
+
+export async function getGalleryPage() {
+  return client.fetch(GALLERY_PAGE_QUERY, {}, REVALIDATE)
 }
 
 export async function getSitemapData() {

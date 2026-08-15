@@ -1,6 +1,7 @@
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
-import { SITE_URL, DEFAULT_SEO } from "@/lib/site";
+import { getSiteSettings } from "@/lib/sanity/queries";
+import { SITE_URL } from "@/lib/site";
 
 const heading = Montserrat({
   variable: "--font-montserrat",
@@ -13,20 +14,25 @@ const body = Inter({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: DEFAULT_SEO.title,
-    template: "%s | Handyman Maintenance",
-  },
-  description: DEFAULT_SEO.description,
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: "en_AE",
-    siteName: "Handyman Maintenance",
-  },
-};
+export async function generateMetadata() {
+  const settings = await getSiteSettings()
+  const siteUrl = settings?.siteUrl || SITE_URL
+  const siteName = settings?.siteName || ''
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: settings?.defaultSeoTitle || siteName,
+      template: siteName ? `%s | ${siteName}` : '%s',
+    },
+    description: settings?.defaultSeoDescription || '',
+    robots: { index: true, follow: true },
+    openGraph: {
+      type: 'website',
+      locale: 'en_AE',
+      siteName,
+    },
+  }
+}
 
 export const viewport = {
   width: "device-width",

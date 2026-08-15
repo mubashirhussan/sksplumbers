@@ -7,8 +7,16 @@ export function telHref(phone) {
   return `tel:${digitsOnly(phone)}`
 }
 
-export function whatsappHref(phone, message = 'Hello Handyman Maintenance, I need a service in Dubai.') {
+export function whatsappHref(phone, message = '') {
   if (!phone) return null
-  const text = encodeURIComponent(message)
-  return `https://wa.me/${digitsOnly(phone)}?text=${text}`
+  const text = message ? `?text=${encodeURIComponent(message)}` : ''
+  return `https://wa.me/${digitsOnly(phone)}${text}`
+}
+
+export function whatsappNumber(settings) {
+  return settings?.whatsappNumber || settings?.phone
+}
+
+export function label(settings, key) {
+  return settings?.labels?.[key] || ''
 }

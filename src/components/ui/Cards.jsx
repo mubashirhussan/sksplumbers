@@ -1,81 +1,84 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import {IMAGES} from '@/lib/images'
+import {label} from '@/lib/contact'
 
 function CardImage({src, alt}) {
-  const image = src || IMAGES.plumbing
+  if (!src) return <div className="relative aspect-[16/10] w-full bg-slate-100" />
   return (
     <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
-      <Image src={image} alt={alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+      <Image src={src} alt={alt || ''} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
     </div>
   )
 }
 
-export function ServiceCard({service}) {
+export function ServiceCard({service, settings}) {
+  if (!service?.slug?.current) return null
+  const more = label(settings, 'readMore')
   return (
     <Link
       href={`/services/${service.slug.current}`}
       className="group block bg-white border border-slate-200 overflow-hidden hover:border-gold hover:shadow-md transition-all"
     >
-      <CardImage src={service.image} alt={service.title} />
+      <CardImage src={service.image} alt={service.imageAlt || service.title} />
       <div className="p-4 sm:p-6">
         <h3 className="font-heading text-lg font-bold uppercase text-navy group-hover:text-gold mb-2 transition-colors">
           {service.title}
         </h3>
-        {service.excerpt && (
-          <p className="text-slate-500 text-sm line-clamp-2">{service.excerpt}</p>
-        )}
-        <span className="inline-block mt-4 text-gold text-sm font-heading font-bold uppercase">
-          Read More
-        </span>
+        {service.excerpt ? <p className="text-slate-500 text-sm line-clamp-2">{service.excerpt}</p> : null}
+        {more ? (
+          <span className="inline-block mt-4 text-gold text-sm font-heading font-bold uppercase">{more}</span>
+        ) : null}
       </div>
     </Link>
   )
 }
 
-export function CategoryCard({category}) {
+export function CategoryCard({category, settings}) {
+  if (!category?.slug?.current) return null
+  const more = label(settings, 'readMore')
   return (
     <Link
       href={`/categories/${category.slug.current}`}
       className="group block bg-white border border-slate-200 overflow-hidden hover:border-gold hover:shadow-md transition-all"
     >
-      <CardImage src={category.image} alt={category.title} />
+      <CardImage src={category.image} alt={category.imageAlt || category.title} />
       <div className="p-4 sm:p-6">
         <h3 className="font-heading text-lg font-bold uppercase text-navy group-hover:text-gold mb-2 transition-colors">
           {category.title}
         </h3>
-        {category.description && (
+        {category.description ? (
           <p className="text-slate-500 text-sm line-clamp-3">{category.description}</p>
-        )}
-        <span className="inline-block mt-4 text-gold text-sm font-heading font-bold uppercase">
-          Read More
-        </span>
+        ) : null}
+        {more ? (
+          <span className="inline-block mt-4 text-gold text-sm font-heading font-bold uppercase">{more}</span>
+        ) : null}
       </div>
     </Link>
   )
 }
 
-export function PostCard({post}) {
+export function PostCard({post, settings}) {
+  if (!post?.slug?.current) return null
   return (
     <Link
       href={`/blog/${post.slug.current}`}
       className="group block bg-white border border-slate-200 overflow-hidden hover:shadow-md transition-all"
     >
-      <CardImage src={post.image || IMAGES.plumbing} alt={post.title} />
+      <CardImage src={post.image} alt={post.imageAlt || post.title} />
       <div className="p-4 sm:p-6">
-        <time className="text-xs text-slate-400" dateTime={post.publishedAt}>
-          {new Date(post.publishedAt).toLocaleDateString('en-AE', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </time>
+        {post.publishedAt ? (
+          <time className="text-xs text-slate-400" dateTime={post.publishedAt}>
+            {new Date(post.publishedAt).toLocaleDateString('en-AE', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </time>
+        ) : null}
         <h3 className="font-heading text-lg font-bold text-navy group-hover:text-gold mt-2 mb-2 transition-colors">
           {post.title}
         </h3>
-        {post.excerpt && (
-          <p className="text-slate-500 text-sm line-clamp-2">{post.excerpt}</p>
-        )}
+        {post.excerpt ? <p className="text-slate-500 text-sm line-clamp-2">{post.excerpt}</p> : null}
       </div>
     </Link>
   )
