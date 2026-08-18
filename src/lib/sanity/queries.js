@@ -346,7 +346,7 @@ export async function getSiteSettings() {
     workingHours: '24/7 Emergency Service',
     whatsappMessage: 'Hello Handyman Maintenance, I need a service in Dubai.',
   }
-  const looksLikeOldBrand = (value = '') => /sks|plumbers-dubai/i.test(value)
+  const looksLikeOldBrand = (value = '') => /sks|plumbers-dubai|handymanmaintenance\.com/i.test(value)
   return {
     ...defaults,
     ...data,
