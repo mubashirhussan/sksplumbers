@@ -257,6 +257,34 @@ export const WHY_CHOOSE_POINTS = [
   'Same-day service for urgent plumbing issues',
 ]
 
+export const HOME_FAQS = [
+  {
+    question: 'How quickly can you respond to emergencies in Dubai?',
+    answer:
+      'Handyman Maintenance offers 24/7 emergency service across Dubai with same-day response for urgent plumbing, electrical, and AC calls.',
+  },
+  {
+    question: 'Are your technicians licensed in Dubai?',
+    answer:
+      'Yes. Our technicians are licensed and experienced professionals serving homes, offices, and villas across Dubai.',
+  },
+  {
+    question: 'Do you provide a free quote before starting work?',
+    answer:
+      'Yes. We give a clear quote before work begins so you know the cost upfront — no hidden charges.',
+  },
+  {
+    question: 'Which areas in Dubai do you cover?',
+    answer:
+      'We serve Dubai Marina, Jumeirah, Business Bay, Downtown, JLT, JVC, Al Barsha, and many more areas across Dubai.',
+  },
+  {
+    question: 'What services can I book with one call?',
+    answer:
+      'Plumbing, electrical, AC, painting, carpentry, and tiles & gypsum — one team for home and office maintenance.',
+  },
+]
+
 export const ABOUT_STATS = [
   {value: '2500+', label: 'Happy Customers'},
   {value: '3500+', label: 'Projects Completed'},
