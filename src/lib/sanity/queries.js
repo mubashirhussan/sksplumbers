@@ -492,19 +492,31 @@ export async function getSiteSettings() {
 
 export async function getSiteHeader() {
   const data = await client.fetch(SITE_HEADER_QUERY, {}, REVALIDATE)
-  const hrefs = (data?.menuItems || []).map((item) => item.href || '').join(' ')
-  if (!data?.menuItems?.length || !hrefs.includes('gallery')) return getFallbackHeader()
-  return normalizeSiteHeader(data)
+  const fallback = getFallbackHeader()
+  if (!data) return fallback
+
+  return normalizeSiteHeader({
+    ...fallback,
+    ...data,
+    menuItems: data.menuItems?.length ? data.menuItems : fallback.menuItems,
+    logoImage: data.logoImage || fallback.logoImage,
+    logoPrimary: data.logoPrimary || fallback.logoPrimary,
+    logoSecondary: data.logoSecondary || fallback.logoSecondary,
+    logoTagline: data.logoTagline || fallback.logoTagline,
+    hideLogoText: data.hideLogoText ?? fallback.hideLogoText,
+  })
 }
 
 export async function getSiteFooter() {
   const data = await client.fetch(SITE_FOOTER_QUERY, {}, REVALIDATE)
-  const hrefs = (data?.columns || [])
-    .flatMap((column) => column.links || [])
-    .map((link) => link.href || '')
-    .join(' ')
-  if (!data?.columns?.length || !hrefs.includes('gallery')) return getFallbackFooter()
-  return normalizeSiteFooter(data)
+  const fallback = getFallbackFooter()
+  if (!data) return fallback
+
+  return normalizeSiteFooter({
+    ...fallback,
+    ...data,
+    columns: data.columns?.length ? data.columns : fallback.columns,
+  })
 }
 
 function normalizeInternalHref(href) {
@@ -546,7 +558,9 @@ function normalizeSiteHeader(data) {
     menuItems: data.menuItems?.map((item) => {
       const link = normalizeNavLink(item)
       const isServices = (item.label || '').toLowerCase() === 'services'
-      if (isServices) {
+      const cmsChildren = item.children?.filter((child) => child?.label && child?.href)
+      // Prefer Sanity dropdown links; fall back to built-in service list if empty
+      if (isServices && !cmsChildren?.length) {
         return {...link, children: SERVICE_MENU_ITEMS}
       }
       return link

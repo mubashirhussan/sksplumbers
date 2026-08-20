@@ -10,10 +10,25 @@ export function Logo({header}) {
 
   return (
     <Link href="/" className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5">
-      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-navy text-gold sm:h-12 sm:w-12">
-        {logoImage ? (
-          <CmsImage src={logoImage} alt={primary} fill className="object-contain p-1" sizes="48px" />
-        ) : (
+      {logoImage ? (
+        <span
+          className={`relative shrink-0 overflow-hidden ${
+            hideText
+              ? 'h-10 w-[150px] sm:h-12 sm:w-[190px]'
+              : 'h-9 w-[72px] sm:h-11 sm:w-[88px]'
+          }`}
+        >
+          <CmsImage
+            src={logoImage}
+            alt={`${primary} ${secondary}`.trim()}
+            fill
+            className="object-contain object-left"
+            sizes={hideText ? '190px' : '88px'}
+            priority
+          />
+        </span>
+      ) : (
+        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-navy text-gold sm:h-12 sm:w-12">
           <svg viewBox="0 0 48 48" className="h-7 w-7 sm:h-10 sm:w-10" aria-hidden="true">
             <path
               d="M8 22 L24 8 L40 22 V40 H30 V28 H18 V40 H8 Z"
@@ -25,8 +40,8 @@ export function Logo({header}) {
             <path d="M18 30 L30 22" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
             <path d="M18 22 L30 30" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
           </svg>
-        )}
-      </span>
+        </span>
+      )}
       {!hideText && (
         <span className="min-w-0 leading-none">
           <span className="block truncate font-heading text-[12px] font-extrabold uppercase tracking-wide text-navy sm:text-[15px] md:text-[17px]">
