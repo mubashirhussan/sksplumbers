@@ -2,16 +2,19 @@ import Link from 'next/link'
 import {CmsImage} from '@/components/ui/CmsImage'
 
 export function Logo({header, settings}) {
-  const primary = header?.logoPrimary || ''
-  const secondary = header?.logoSecondary || ''
-  const tagline = header?.logoTagline || ''
+  const primary = (header?.logoPrimary || '').trim()
+  const secondary = (header?.logoSecondary || '').trim()
+  const tagline = (header?.logoTagline || '').trim()
   const logoImage = header?.logoImage
-  const hideText = Boolean(header?.hideLogoText)
+  // With a CMS logo image, hide text unless editor explicitly turns "Hide logo text" OFF
+  const hideText =
+    header?.hideLogoText === true ||
+    (logoImage && header?.hideLogoText !== false)
   const alt =
     [primary, secondary].filter(Boolean).join(' ') ||
     settings?.siteName ||
     'Home'
-  const showText = !hideText && (primary || secondary || tagline)
+  const showText = !hideText && Boolean(primary || secondary || tagline)
 
   if (!logoImage && !showText) return null
 
@@ -20,9 +23,7 @@ export function Logo({header, settings}) {
       {logoImage ? (
         <span
           className={`relative shrink-0 overflow-hidden ${
-            hideText || !showText
-              ? 'h-10 w-[150px] sm:h-12 sm:w-[190px]'
-              : 'h-9 w-[72px] sm:h-11 sm:w-[88px]'
+            showText ? 'h-9 w-[72px] sm:h-11 sm:w-[88px]' : 'h-10 w-[150px] sm:h-12 sm:w-[190px]'
           }`}
         >
           <CmsImage
@@ -30,7 +31,7 @@ export function Logo({header, settings}) {
             alt={alt}
             fill
             className="object-contain object-left"
-            sizes={hideText || !showText ? '190px' : '88px'}
+            sizes={showText ? '88px' : '190px'}
             priority
           />
         </span>

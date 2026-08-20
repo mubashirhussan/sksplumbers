@@ -35,10 +35,13 @@ export function WhatsAppButton({href, className = '', label, subtext}) {
     >
       <Icon name="whatsapp" className="w-6 h-6 shrink-0" />
       <span className="min-w-0 text-left leading-tight">
-        <span className="block font-heading font-extrabold uppercase text-sm">
-          {label || 'WhatsApp Now'}
-        </span>
-        <span className="block text-[11px] font-medium opacity-90">{subtext || 'Quick Response'}</span>
+        {label ? (
+          <span className="block font-heading font-extrabold uppercase text-sm">{label}</span>
+        ) : null}
+        {subtext ? <span className="block text-[11px] font-medium opacity-90">{subtext}</span> : null}
+        {!label && !subtext ? (
+          <span className="block truncate font-heading text-sm font-extrabold">WhatsApp</span>
+        ) : null}
       </span>
     </a>
   )
