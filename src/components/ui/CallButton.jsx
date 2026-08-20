@@ -12,9 +12,11 @@ export function CallButton({phone, className = '', label}) {
     >
       <Icon name="phone" className="w-5 h-5 shrink-0" />
       <span className="min-w-0 text-left leading-tight">
-        <span className="block font-heading font-bold uppercase text-[11px] tracking-wide">
-          {label || 'Call Now'}
-        </span>
+        {label ? (
+          <span className="block font-heading font-bold uppercase text-[11px] tracking-wide">
+            {label}
+          </span>
+        ) : null}
         <span className="block truncate font-heading text-sm font-extrabold">{phone}</span>
       </span>
     </a>

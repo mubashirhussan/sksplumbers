@@ -1,6 +1,6 @@
 import {client} from '@/sanity/client'
 import {DEFAULT_SEO, HANDYMAN_SERVICE_SLUGS, SITE_NAME, SITE_URL, SERVICE_SLUGS} from '@/lib/site'
-import {getFallbackHeader, getFallbackFooter} from '@/lib/fallback-navigation'
+import {getFallbackFooter} from '@/lib/fallback-navigation'
 import {
   getAllFallbackServices,
   getAllFallbackCategories,
@@ -10,7 +10,7 @@ import {
   getFallbackServicesByCategory,
 } from '@/lib/fallback-content'
 import {IMAGES, withServiceImage, withCategoryImage} from '@/lib/images'
-import {SERVICE_MENU_ITEMS, HERO_TRUST} from '@/lib/site-content'
+import {HERO_TRUST} from '@/lib/site-content'
 
 export const REVALIDATE =
   process.env.NODE_ENV === 'production'
@@ -492,19 +492,18 @@ export async function getSiteSettings() {
 
 export async function getSiteHeader() {
   const data = await client.fetch(SITE_HEADER_QUERY, {}, REVALIDATE)
-  const fallback = getFallbackHeader()
-  if (!data) return fallback
-
-  return normalizeSiteHeader({
-    ...fallback,
-    ...data,
-    menuItems: data.menuItems?.length ? data.menuItems : fallback.menuItems,
-    logoImage: data.logoImage || fallback.logoImage,
-    logoPrimary: data.logoPrimary || fallback.logoPrimary,
-    logoSecondary: data.logoSecondary || fallback.logoSecondary,
-    logoTagline: data.logoTagline || fallback.logoTagline,
-    hideLogoText: data.hideLogoText ?? fallback.hideLogoText,
-  })
+  if (!data) {
+    return {
+      menuItems: [],
+      logoImage: null,
+      logoPrimary: null,
+      logoSecondary: null,
+      logoTagline: null,
+      hideLogoText: false,
+      ctaButton: null,
+    }
+  }
+  return normalizeSiteHeader(data)
 }
 
 export async function getSiteFooter() {
@@ -541,12 +540,9 @@ function normalizeButtonHref(href, linkType) {
 
 function normalizeNavLink(link) {
   if (!link) return link
-  const mappedHref = SERVICE_MENU_ITEMS.find(
-    (item) => item.label.toLowerCase() === (link.label || '').toLowerCase(),
-  )?.href
   return {
     ...link,
-    href: mappedHref || normalizeInternalHref(link.href),
+    href: normalizeInternalHref(link.href),
     children: link.children?.map(normalizeNavLink),
   }
 }
@@ -555,18 +551,14 @@ function normalizeSiteHeader(data) {
   if (!data) return data
   return {
     ...data,
-    menuItems: data.menuItems?.map((item) => {
-      const link = normalizeNavLink(item)
-      const isServices = (item.label || '').toLowerCase() === 'services'
-      const cmsChildren = item.children?.filter((child) => child?.label && child?.href)
-      // Prefer Sanity dropdown links; fall back to built-in service list if empty
-      if (isServices && !cmsChildren?.length) {
-        return {...link, children: SERVICE_MENU_ITEMS}
-      }
-      return link
-    }),
-    ctaButton: data.ctaButton?.href
-      ? {...data.ctaButton, href: normalizeInternalHref(data.ctaButton.href)}
+    menuItems: (data.menuItems || [])
+      .filter((item) => item?.label && (item?.href || item?.children?.length))
+      .map((item) => normalizeNavLink(item)),
+    ctaButton: data.ctaButton
+      ? {
+          ...data.ctaButton,
+          href: data.ctaButton.href ? normalizeButtonHref(data.ctaButton.href, data.ctaButton.linkType) : data.ctaButton.href,
+        }
       : data.ctaButton,
   }
 }

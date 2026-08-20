@@ -18,7 +18,7 @@ export function Footer({settings, footer, header}) {
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-10 md:grid-cols-2 md:py-14 lg:grid-cols-4">
         <div>
           <div className="mb-4 inline-block rounded-md bg-white p-2">
-            <Logo header={header} />
+            <Logo header={header} settings={settings} />
           </div>
           <p className="mb-4 text-sm leading-relaxed text-white/70">
             {footer?.description || settings?.tagline || 'Professional handyman and maintenance services in Dubai.'}

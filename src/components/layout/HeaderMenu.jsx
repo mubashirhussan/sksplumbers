@@ -154,10 +154,11 @@ function MobileMenuItem({item, onNavigate}) {
   )
 }
 
-export function HeaderMenu({menuItems, phone, callLabel}) {
+export function HeaderMenu({menuItems = [], phone, callLabel}) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const tel = telHref(phone)
+  const items = Array.isArray(menuItems) ? menuItems : []
 
   useEffect(() => {
     setMobileOpen(false)
@@ -175,7 +176,7 @@ export function HeaderMenu({menuItems, phone, callLabel}) {
   return (
     <>
       <nav className="hidden lg:flex items-center gap-3 xl:gap-5" aria-label="Main navigation">
-        {menuItems.map((item) => (
+        {items.map((item) => (
           <DesktopMenuItem key={`${item.label}-${item.href}`} item={item} pathname={pathname} />
         ))}
       </nav>
@@ -185,7 +186,7 @@ export function HeaderMenu({menuItems, phone, callLabel}) {
           <a
             href={tel}
             className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-navy text-white"
-            aria-label={`Call ${phone}`}
+            aria-label={callLabel ? `${callLabel} ${phone}` : `Call ${phone}`}
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path
@@ -197,28 +198,30 @@ export function HeaderMenu({menuItems, phone, callLabel}) {
             </svg>
           </a>
         )}
-        <button
-          type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-navy"
-          aria-label="Toggle menu"
-          aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((value) => !value)}
-        >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            {mobileOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+        {items.length > 0 ? (
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-navy"
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((value) => !value)}
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {mobileOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        ) : null}
       </div>
 
-      {mobileOpen && (
+      {mobileOpen && items.length > 0 ? (
         <div className="absolute inset-x-0 top-full max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-slate-100 bg-white shadow-lg lg:hidden">
           <nav className="space-y-2 px-4 py-3" aria-label="Mobile navigation">
             <CallButton phone={phone} className="w-full justify-center" label={callLabel} />
-            {menuItems.map((item) => (
+            {items.map((item) => (
               <MobileMenuItem
                 key={`mobile-nav-${item.label}-${item.href}`}
                 item={item}
@@ -227,7 +230,7 @@ export function HeaderMenu({menuItems, phone, callLabel}) {
             ))}
           </nav>
         </div>
-      )}
+      ) : null}
     </>
   )
 }
