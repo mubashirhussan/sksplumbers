@@ -185,17 +185,6 @@ const NEW_SECTIONS = [
     buttonHref: '/service-areas/',
   },
   {
-    _type: 'homeCategories',
-    _key: 'categories',
-    heading: 'Service Categories',
-  },
-  {
-    _type: 'homeBlog',
-    _key: 'blog',
-    heading: 'Latest from Blog',
-    show: true,
-  },
-  {
     _type: 'homeContact',
     _key: 'contact',
     heading: 'Contact Us Today',
@@ -217,9 +206,7 @@ const NEW_SECTIONS = [
 
 const existing = await client.fetch(`*[_type == "homePage"][0]{
   _id,
-  "selectedServices": sections[_type == "homeServices"][0].selectedServices,
-  "selectedCategories": sections[_type == "homeCategories"][0].selectedCategories,
-  "selectedPosts": sections[_type == "homeBlog"][0].selectedPosts
+  "selectedServices": sections[_type == "homeServices"][0].selectedServices
 }`)
 
 if (!existing?._id) {
@@ -229,12 +216,6 @@ if (!existing?._id) {
 const sections = NEW_SECTIONS.map((section) => {
   if (section._type === 'homeServices' && existing.selectedServices?.length) {
     return {...section, selectedServices: existing.selectedServices}
-  }
-  if (section._type === 'homeCategories' && existing.selectedCategories?.length) {
-    return {...section, selectedCategories: existing.selectedCategories}
-  }
-  if (section._type === 'homeBlog' && existing.selectedPosts?.length) {
-    return {...section, selectedPosts: existing.selectedPosts}
   }
   return section
 })
