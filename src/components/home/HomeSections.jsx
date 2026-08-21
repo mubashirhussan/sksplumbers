@@ -5,7 +5,6 @@ import {CallButton, WhatsAppButton} from '@/components/ui/CallButton'
 import {TrustBar} from '@/components/ui/TrustBar'
 import {CTASection} from '@/components/ui/CTASection'
 import {QuoteForm} from '@/components/ui/QuoteForm'
-import {CategoryCard, PostCard} from '@/components/ui/Cards'
 import {IMAGES} from '@/lib/images'
 import {
   HERO_TRUST,
@@ -572,41 +571,6 @@ function FaqSection({section, settings}) {
   )
 }
 
-function CategoriesSection({section}) {
-  const categories = section?.selectedCategories || []
-  if (!categories.length) return null
-  return (
-    <section className="bg-white py-10 md:py-16">
-      <div className="mx-auto max-w-7xl px-4">
-        <SectionHeading>{section?.heading || 'Service Categories'}</SectionHeading>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => (
-            <CategoryCard key={category._id || category.slug?.current || category.title} category={category} />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function BlogSection({section}) {
-  if (section?.show === false) return null
-  const posts = section?.selectedPosts || []
-  if (!posts.length) return null
-  return (
-    <section className="bg-slate-50 py-10 md:py-16">
-      <div className="mx-auto max-w-7xl px-4">
-        <SectionHeading>{section?.heading || 'Latest from Blog'}</SectionHeading>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <PostCard key={post._id || post.slug?.current || post.title} post={post} />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 function ContactBannerSection({section, settings}) {
   return (
     <div className="mx-auto max-w-7xl px-4">
@@ -645,10 +609,6 @@ export function HomeSections({settings, home}) {
             return <TrustBar key={section._key} items={trustItems} />
           case 'homeServiceAreas':
             return <ServiceAreasSection key={section._key} section={section} settings={settings} />
-          case 'homeCategories':
-            return <CategoriesSection key={section._key} section={section} />
-          case 'homeBlog':
-            return <BlogSection key={section._key} section={section} />
           case 'homeContact':
             return <ContactSection key={section._key} section={section} settings={settings} />
           case 'homeContactBanner':

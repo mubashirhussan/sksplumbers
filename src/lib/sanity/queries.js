@@ -1,6 +1,5 @@
 import {client} from '@/sanity/client'
 import {DEFAULT_SEO, HANDYMAN_SERVICE_SLUGS, SITE_NAME, SITE_URL, SERVICE_SLUGS} from '@/lib/site'
-import {getFallbackFooter} from '@/lib/fallback-navigation'
 import {
   getAllFallbackServices,
   getAllFallbackCategories,
@@ -9,8 +8,7 @@ import {
   getFallbackPage,
   getFallbackServicesByCategory,
 } from '@/lib/fallback-content'
-import {IMAGES, withServiceImage, withCategoryImage} from '@/lib/images'
-import {HERO_TRUST} from '@/lib/site-content'
+import {withServiceImage, withCategoryImage} from '@/lib/images'
 
 export const REVALIDATE =
   process.env.NODE_ENV === 'production'
@@ -165,167 +163,6 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
   },
   ${seoProjection}
 }`
-
-const fallbackHomePage = {
-  heroHeadingPrefix: "Dubai's Trusted",
-  heroHeadingHighlight: 'Handyman & Maintenance',
-  heroHeadingSuffix: 'Experts',
-  heroHeading: "Dubai's Trusted Handyman & Maintenance Experts",
-  heroText: 'One Call for All Your Home, Office & Villa Maintenance Needs.',
-  heroTextHighlights: ['One Call', 'Office'],
-  heroImage: IMAGES.hero,
-  heroButtons: [
-    {
-      label: 'WhatsApp Now',
-      linkType: 'whatsapp',
-      href: '',
-      style: 'primary',
-      openInNewTab: true,
-    },
-    {
-      label: 'Call Now',
-      linkType: 'phone',
-      href: '',
-      style: 'secondary',
-      openInNewTab: false,
-    },
-  ],
-  heroTrust: HERO_TRUST,
-  emergencyCard: {
-    enabled: true,
-    title: 'Emergency Service',
-    subtitle: 'We deliver 7 days a week',
-    badge: '24/7',
-    icon: 'clock',
-  },
-  sections: [
-    {
-      _type: 'homeServices',
-      _key: 'services',
-      heading: 'Our Services',
-      cardButtonLabel: 'Learn More',
-      viewAllLabel: 'View All Services',
-      viewAllHref: '/services/',
-    },
-    {
-      _type: 'homeMission',
-      _key: 'mission',
-      theme: 'gold',
-      heading: "Dubai's Trusted Handyman And Maintenance Company",
-      description:
-        'Handyman Maintenance delivers fast, affordable home and office services across Dubai. From emergency plumbing to electrical, AC, painting, carpentry, and tiles — one call covers your villa, apartment, or workplace.',
-      buttonText: 'Contact Us',
-      buttonHref: '/contact/',
-    },
-    {
-      _type: 'homeFeature',
-      _key: 'approach',
-      eyebrow: 'Our Approach',
-      heading: 'Handyman Maintenance: Reliable Approach',
-      theme: 'dark',
-      imagePosition: 'right',
-      image: IMAGES.detail,
-      items: [
-        {
-          icon: 'calendar',
-          title: 'Simple And Fast Scheduling',
-          text: 'Book by phone or WhatsApp and get a clear arrival window.',
-        },
-        {
-          icon: 'clock',
-          title: 'On-Time Arrivals',
-          text: 'Our team respects your time and updates you if plans change.',
-        },
-        {
-          icon: 'van',
-          title: 'Fully Equipped Visits',
-          text: 'Technicians arrive with tools and common parts ready to work.',
-        },
-        {
-          icon: 'quality',
-          title: 'Quality You Can Trust',
-          text: 'We test the repair and make sure the job is done properly before we leave.',
-        },
-      ],
-      buttonText: 'Contact Us',
-      buttonHref: '/contact/',
-    },
-    {
-      _type: 'homeWhyChoose',
-      _key: 'why-choose',
-      eyebrow: 'Why Choose Us',
-      heading: 'Why Handyman Maintenance',
-      description: 'Dubai homes and businesses choose us for fast response, clear pricing, and reliable workmanship.',
-      useSitePoints: true,
-      image: IMAGES.about,
-      buttonText: 'Learn More',
-      buttonHref: '/why-choose-us/',
-    },
-    {
-      _type: 'homeFaq',
-      _key: 'faq',
-      eyebrow: 'FAQs',
-      heading: 'Frequently Asked Questions',
-      description: 'Quick answers about our handyman and maintenance services in Dubai.',
-      faqs: [
-        {
-          question: 'How quickly can you respond to emergencies in Dubai?',
-          answer:
-            'Handyman Maintenance offers 24/7 emergency service across Dubai with same-day response for urgent plumbing, electrical, and AC calls.',
-        },
-        {
-          question: 'Are your technicians licensed in Dubai?',
-          answer:
-            'Yes. Our technicians are licensed and experienced professionals serving homes, offices, and villas across Dubai.',
-        },
-        {
-          question: 'Do you provide a free quote before starting work?',
-          answer:
-            'Yes. We give a clear quote before work begins so you know the cost upfront — no hidden charges.',
-        },
-        {
-          question: 'Which areas in Dubai do you cover?',
-          answer:
-            'We serve Dubai Marina, Jumeirah, Business Bay, Downtown, JLT, JVC, Al Barsha, and many more areas across Dubai.',
-        },
-        {
-          question: 'What services can I book with one call?',
-          answer:
-            'Plumbing, electrical, AC, painting, carpentry, and tiles & gypsum — one team for home and office maintenance.',
-        },
-      ],
-    },
-    {_type: 'homeTrust', _key: 'trust'},
-    {
-      _type: 'homeServiceAreas',
-      _key: 'areas',
-      heading: 'Areas We Serve',
-      useSiteAreas: true,
-      image: IMAGES.skyline,
-      buttonText: 'View All Areas',
-      buttonHref: '/service-areas/',
-    },
-    {_type: 'homeCategories', _key: 'categories', heading: 'Service Categories'},
-    {_type: 'homeBlog', _key: 'blog', heading: 'Latest from Blog', show: true},
-    {
-      _type: 'homeContact',
-      _key: 'contact',
-      heading: 'Contact Us Today',
-      description: 'Tell us what you need and we will get back to you quickly.',
-      showForm: true,
-      showDetails: true,
-    },
-    {
-      _type: 'homeContactBanner',
-      _key: 'cta',
-      heading: 'Need a Handyman in Dubai?',
-      description:
-        'Handyman Maintenance offers fast, affordable services across Dubai. Available 24/7 for emergencies.',
-      buttonText: 'Get Free Quote',
-      showPhone: true,
-    },
-  ],
-}
 
 export const SERVICES_QUERY = `*[_type == "service" && defined(slug.current)]|order(title asc){
   _id,
@@ -492,8 +329,8 @@ export async function getSiteSettings() {
 
 export async function getSiteHeader() {
   const data = await client.fetch(SITE_HEADER_QUERY, {}, REVALIDATE)
-  if (!data) {
-    return {
+  return normalizeSiteHeader(
+    data || {
       menuItems: [],
       logoImage: null,
       logoPrimary: null,
@@ -501,26 +338,53 @@ export async function getSiteHeader() {
       logoTagline: null,
       hideLogoText: false,
       ctaButton: null,
-    }
-  }
-  return normalizeSiteHeader(data)
+    },
+  )
 }
 
 export async function getSiteFooter() {
   const data = await client.fetch(SITE_FOOTER_QUERY, {}, REVALIDATE)
-  const fallback = getFallbackFooter()
-  if (!data) return fallback
-
-  return normalizeSiteFooter({
-    ...fallback,
-    ...data,
-    columns: data.columns?.length ? data.columns : fallback.columns,
-  })
+  return normalizeSiteFooter(
+    data || {
+      brandTitle: null,
+      description: null,
+      columns: [],
+      copyrightText: null,
+      bottomNote: null,
+    },
+  )
 }
 
 function normalizeInternalHref(href) {
   if (!href) return href
-  const withSlash = href.startsWith('/') ? href : `/${href}`
+
+  const trimmed = href.trim()
+  if (
+    trimmed.startsWith('mailto:') ||
+    trimmed.startsWith('tel:') ||
+    trimmed.startsWith('sms:') ||
+    trimmed.startsWith('whatsapp:') ||
+    trimmed.startsWith('//')
+  ) {
+    return trimmed
+  }
+
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    try {
+      const url = new URL(trimmed)
+      const siteHost = new URL(SITE_URL).hostname.replace(/^www\./, '')
+      const linkHost = url.hostname.replace(/^www\./, '')
+      // Same-site absolute URLs → path only; keep true external URLs intact
+      if (linkHost === siteHost) {
+        return `${url.pathname}${url.search}${url.hash}` || '/'
+      }
+      return trimmed
+    } catch {
+      return trimmed
+    }
+  }
+
+  const withSlash = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
   return withSlash.replace(/^\/pages\//, '/')
 }
 
@@ -577,56 +441,27 @@ function normalizeSiteFooter(data) {
   }
 }
 
-function mergeHomeSections(cmsSections, fallbackSections) {
-  if (!cmsSections?.length) return fallbackSections
-
-  const presentKeys = new Set(cmsSections.map((section) => section._key).filter(Boolean))
-  const presentTypes = new Set(cmsSections.map((section) => section._type).filter(Boolean))
-  const multiTypes = new Set(['homeFeature'])
-
-  const missing = fallbackSections.filter((section) => {
-    if (section._key && presentKeys.has(section._key)) return false
-    if (multiTypes.has(section._type)) {
-      return section._key ? !presentKeys.has(section._key) : true
-    }
-    return !presentTypes.has(section._type)
-  })
-
-  if (!missing.length) return cmsSections
-
-  // Insert missing sections before the final CTA when possible
-  const ctaIndex = cmsSections.findIndex((section) => section._type === 'homeContactBanner')
-  if (ctaIndex === -1) return [...cmsSections, ...missing]
-
-  return [...cmsSections.slice(0, ctaIndex), ...missing, ...cmsSections.slice(ctaIndex)]
-}
-
 function normalizeHomePage(data) {
-  if (!data) return fallbackHomePage
+  if (!data) return null
 
   const heroButtons = (data.heroButtons || [])
-    .filter((button) => button?.label && (button?.href || button?.linkType === 'phone' || button?.linkType === 'whatsapp'))
+    .filter(
+      (button) =>
+        button?.label && (button?.href || button?.linkType === 'phone' || button?.linkType === 'whatsapp'),
+    )
     .map((button) => ({
       ...button,
       href: normalizeButtonHref(button.href, button.linkType),
     }))
 
+  const sections = (data.sections || []).filter(
+    (section) => section._type !== 'homeCategories' && section._type !== 'homeBlog',
+  )
+
   return {
-    ...fallbackHomePage,
     ...data,
-    heroImage: data.heroImage || fallbackHomePage.heroImage,
-    heroHeadingPrefix: data.heroHeadingPrefix || fallbackHomePage.heroHeadingPrefix,
-    heroHeadingHighlight: data.heroHeadingHighlight || fallbackHomePage.heroHeadingHighlight,
-    heroHeadingSuffix: data.heroHeadingSuffix || fallbackHomePage.heroHeadingSuffix,
-    heroHeading: data.heroHeading || fallbackHomePage.heroHeading,
-    heroText: data.heroText || fallbackHomePage.heroText,
-    heroTextHighlights: data.heroTextHighlights?.length
-      ? data.heroTextHighlights
-      : fallbackHomePage.heroTextHighlights,
-    heroButtons: heroButtons.length ? heroButtons : fallbackHomePage.heroButtons,
-    heroTrust: data.heroTrust?.length ? data.heroTrust : fallbackHomePage.heroTrust,
-    emergencyCard: data.emergencyCard || fallbackHomePage.emergencyCard,
-    sections: mergeHomeSections(data.sections, fallbackHomePage.sections),
+    heroButtons,
+    sections,
   }
 }
 

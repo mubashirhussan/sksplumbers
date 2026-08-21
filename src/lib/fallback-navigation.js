@@ -1,34 +1,3 @@
-import {SERVICE_MENU_ITEMS} from '@/lib/site-content'
-
-export const fallbackHeader = {
-  announcementText: '24/7 Emergency Service',
-  showPhoneInBar: true,
-  logoPrimary: 'Handyman',
-  logoSecondary: 'Maintenance',
-  logoTagline: '- DUBAI -',
-  logoImage: null,
-  menuItems: [
-    {label: 'Home', href: '/', openInNewTab: false, children: []},
-    {
-      label: 'Services',
-      href: '/services/',
-      openInNewTab: false,
-      children: SERVICE_MENU_ITEMS,
-    },
-    {label: 'About Us', href: '/about/', openInNewTab: false, children: []},
-    {label: 'Why Choose Us', href: '/why-choose-us/', openInNewTab: false, children: []},
-    {label: 'Service Areas', href: '/service-areas/', openInNewTab: false, children: []},
-    {label: 'Gallery', href: '/gallery/', openInNewTab: false, children: []},
-    {label: 'Contact Us', href: '/contact/', openInNewTab: false, children: []},
-  ],
-  ctaButton: {
-    enabled: true,
-    label: 'Call Now',
-    href: '/contact/',
-    openInNewTab: false,
-  },
-}
-
 export const fallbackFooter = {
   brandTitle: 'Handyman Maintenance Dubai',
   description:
@@ -67,10 +36,6 @@ export const fallbackFooter = {
   ],
   copyrightText: '© {year} Handyman Maintenance. All rights reserved.',
   bottomNote: 'Licensed Plumbing Services in Dubai, UAE',
-}
-
-export function getFallbackHeader() {
-  return fallbackHeader
 }
 
 export function getFallbackFooter() {
