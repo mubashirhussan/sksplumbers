@@ -30,10 +30,6 @@ function navPath(href) {
 const header = await client.fetch(`*[_type == "siteHeader"][0]{_id, menuItems}`)
 if (!header?._id) throw new Error('siteHeader document not found')
 
-const categories = await client.fetch(
-  `*[_type == "category" && defined(slug.current)]|order(title asc){title, "slug": slug.current}`,
-)
-
 const byPath = new Map()
 for (const item of header.menuItems || []) {
   byPath.set(navPath(item.href).toLowerCase(), item)
@@ -66,16 +62,10 @@ const serviceChildren =
       }))
     : []
 
-const categoryChildren = categories.map((cat) => ({
-  label: cat.title,
-  href: `/categories/${cat.slug}/`,
-}))
-
 // Canonical dynamic menu order — all from Sanity content refs
 const menuItems = [
   menuItem('Home', '/'),
   menuItem('Services', '/services/', serviceChildren),
-  menuItem('Categories', '/categories/', categoryChildren),
   menuItem('About Us', '/about/'),
   menuItem('Why Choose Us', '/why-choose-us/'),
   menuItem('Service Areas', '/service-areas/'),

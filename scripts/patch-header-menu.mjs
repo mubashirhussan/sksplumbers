@@ -47,23 +47,8 @@ function withKeys(item) {
 const header = await client.fetch(`*[_type == "siteHeader"][0]{_id, menuItems}`)
 if (!header?._id) throw new Error('siteHeader document not found')
 
-const categories = await client.fetch(
-  `*[_type == "category" && defined(slug.current)]|order(title asc){title, "slug": slug.current}`,
-)
-
 const existing = (header.menuItems || []).map(withKeys)
 const paths = new Set(existing.map((item) => navPath(item.href).toLowerCase()))
-
-const categoriesItem = withKeys({
-  label: 'Categories',
-  href: '/categories/',
-  openInNewTab: false,
-  children: categories.map((cat) => ({
-    label: cat.title,
-    href: `/categories/${cat.slug}/`,
-    openInNewTab: false,
-  })),
-})
 
 const blogItem = withKeys({
   label: 'Blog',
@@ -73,7 +58,6 @@ const blogItem = withKeys({
 })
 
 const extras = []
-if (!paths.has('/categories')) extras.push(categoriesItem)
 if (!paths.has('/blog')) extras.push(blogItem)
 
 let menuItems = existing
@@ -87,20 +71,10 @@ if (extras.length) {
       : [...existing, ...extras]
 }
 
-// If Categories already exists but has no children, fill from Sanity categories
-menuItems = menuItems.map((item) => {
-  if (navPath(item.href).toLowerCase() !== '/categories') return item
-  if (item.children?.length) return item
-  return {
-    ...item,
-    children: categories.map((cat) => ({
-      _type: 'navLink',
-      _key: key('nl'),
-      label: cat.title,
-      href: `/categories/${cat.slug}/`,
-      openInNewTab: false,
-    })),
-  }
+// Drop Categories from the header menu
+menuItems = menuItems.filter((item) => {
+  const path = navPath(item.href).toLowerCase()
+  return path !== '/categories' && !/^categor/i.test(item.label || '')
 })
 
 await client.patch(header._id).set({menuItems}).commit()
