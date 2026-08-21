@@ -62,7 +62,7 @@ const serviceChildren =
   services?.children?.length > 0
     ? services.children.map((child) => ({
         label: child.label,
-        href: child.href,
+        href: (child.href || '').replace(/^\/services\//, '/'),
       }))
     : []
 

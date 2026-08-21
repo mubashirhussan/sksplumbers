@@ -41,3 +41,9 @@ export const SERVICE_SLUGS = [
 export const PAGE_SLUGS = ['about', 'contact']
 
 export const STATIC_PAGE_PATHS = ['why-choose-us', 'service-areas', 'gallery']
+
+/** Individual service URLs are root-level: /plumbing/ not /services/plumbing/ */
+export function servicePath(slug) {
+  const clean = typeof slug === 'string' ? slug : slug?.current
+  return clean ? `/${clean}/` : '/services/'
+}

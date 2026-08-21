@@ -2,7 +2,7 @@ export const HOME_SERVICE_CARDS = [
   {
     title: 'Plumbing',
     slug: 'plumbing',
-    href: '/services/plumbing/',
+    href: '/plumbing/',
     icon: 'plumbing',
     image: '/images/gallery-pipe-repair.png',
     items: ['Leakage & Pipe Repair', 'Drain Blockage', 'Toilet Installation'],
@@ -35,7 +35,7 @@ export const HOME_SERVICE_CARDS = [
   {
     title: 'Electrical',
     slug: 'electrical',
-    href: '/services/electrical/',
+    href: '/electrical/',
     icon: 'bolt',
     image: '/images/service-electrical.png',
     items: ['Wiring', 'Light Installation', 'Switches & Sockets'],
@@ -68,7 +68,7 @@ export const HOME_SERVICE_CARDS = [
   {
     title: 'AC Services',
     slug: 'ac-services',
-    href: '/services/ac-services/',
+    href: '/ac-services/',
     icon: 'snowflake',
     image: '/images/service-ac.png',
     items: ['AC Installation', 'AC Repair', 'AC Cleaning'],
@@ -101,7 +101,7 @@ export const HOME_SERVICE_CARDS = [
   {
     title: 'Painting',
     slug: 'painting',
-    href: '/services/painting/',
+    href: '/painting/',
     icon: 'paint',
     image: '/images/service-painting.png',
     items: ['Interior & Exterior', 'Wall Paint', 'Touch-ups'],
@@ -134,7 +134,7 @@ export const HOME_SERVICE_CARDS = [
   {
     title: 'Carpentry',
     slug: 'carpentry',
-    href: '/services/carpentry/',
+    href: '/carpentry/',
     icon: 'saw',
     image: '/images/service-carpentry.png',
     items: ['Door Repair', 'Lock Installation', 'Wardrobes'],
@@ -167,7 +167,7 @@ export const HOME_SERVICE_CARDS = [
   {
     title: 'Tiles & Gypsum',
     slug: 'tiles-gypsum',
-    href: '/services/tiles-gypsum/',
+    href: '/tiles-gypsum/',
     icon: 'tiles',
     image: '/images/service-tiles.png',
     items: ['Tile Fixing', 'Grouting', 'Gypsum Ceiling'],

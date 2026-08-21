@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import {CmsImage} from '@/components/ui/CmsImage'
 import {IMAGES} from '@/lib/images'
+import {servicePath} from '@/lib/site'
 
 function CardImage({src, alt}) {
   const image = src || IMAGES.plumbing
@@ -15,7 +16,7 @@ export function ServiceCard({service}) {
   const slug = service.slug?.current || service.slug
   return (
     <Link
-      href={`/services/${slug}`}
+      href={servicePath(slug)}
       className="group block bg-white border border-slate-200 overflow-hidden hover:border-gold hover:shadow-md transition-all"
     >
       <CardImage src={service.image} alt={service.title} />

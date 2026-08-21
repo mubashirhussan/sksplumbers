@@ -28,8 +28,8 @@ export const fallbackFooter = {
       title: 'Contact',
       links: [
         {label: 'Contact Form', href: '/contact/', openInNewTab: false},
-        {label: 'Emergency Plumber', href: '/services/emergency-plumber/', openInNewTab: false},
-        {label: '24/7 Plumbing Service', href: '/services/247-plumbing-service/', openInNewTab: false},
+        {label: 'Emergency Plumber', href: '/emergency-plumber/', openInNewTab: false},
+        {label: '24/7 Plumbing Service', href: '/247-plumbing-service/', openInNewTab: false},
         {label: 'Blog', href: '/blog/', openInNewTab: false},
       ],
     },

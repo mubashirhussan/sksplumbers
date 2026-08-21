@@ -47,7 +47,7 @@ export default async function sitemap() {
   }))
 
   const servicePages = services.map((svc) => ({
-    url: `${SITE_URL}/services/${svc.slug}/`,
+    url: `${SITE_URL}/${svc.slug}/`,
     lastModified: svc._updatedAt || new Date(),
     changeFrequency: 'monthly',
     priority: 0.8,

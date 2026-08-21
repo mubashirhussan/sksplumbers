@@ -35,7 +35,7 @@ export function serviceSchema(service, settings) {
     '@type': 'Service',
     name: service.title,
     description: service.excerpt || service.seo?.metaDescription,
-    url: `${SITE_URL}/services/${service.slug.current}`,
+    url: `${SITE_URL}/${service.slug.current}/`,
     provider: {
       '@type': 'Plumber',
       name: settings?.siteName || SITE_NAME,

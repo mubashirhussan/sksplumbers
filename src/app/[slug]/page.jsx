@@ -25,7 +25,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({params}) {
   const {slug} = await params
   const service = await getServiceBySlug(slug)
-  return buildSeoFromDoc(service, `/services/${slug}`, 'Plumbing Service Dubai')
+  return buildSeoFromDoc(service, `/${slug}`, 'Plumbing Service Dubai')
 }
 
 export default async function ServicePage({params}) {
@@ -45,7 +45,7 @@ export default async function ServicePage({params}) {
     ...(service.category
       ? [{name: service.category.title, path: `/categories/${service.category.slug.current}`}]
       : []),
-    {name: service.title, path: `/services/${slug}`},
+    {name: service.title, path: `/${slug}`},
   ]
 
   return (

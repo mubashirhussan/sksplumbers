@@ -52,7 +52,7 @@ function toServiceCard(service) {
   return {
     title: service.title || local?.title,
     slug,
-    href: `/services/${slug}/`,
+    href: `/${slug}/`,
     icon: service.icon || local?.icon || 'plumbing',
     image: service.image || local?.image || IMAGES.plumbing,
     excerpt: service.excerpt || local?.excerpt || '',

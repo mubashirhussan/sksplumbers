@@ -20,6 +20,16 @@ const nextConfig = {
         destination: '/:slug',
         permanent: true,
       },
+      {
+        source: '/services/:slug',
+        destination: '/:slug',
+        permanent: true,
+      },
+      {
+        source: '/services/:slug/',
+        destination: '/:slug/',
+        permanent: true,
+      },
     ]
   },
 };

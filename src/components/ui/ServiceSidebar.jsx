@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import {Icon} from '@/components/ui/Icons'
+import {servicePath} from '@/lib/site'
 
 export function ServiceSidebar({currentSlug, services = [], settings}) {
   const otherServices = services.filter((service) => {
@@ -22,7 +23,7 @@ export function ServiceSidebar({currentSlug, services = [], settings}) {
               return (
                 <li key={service._id || slug}>
                   <Link
-                    href={`/services/${slug}/`}
+                    href={servicePath(slug)}
                     className="group flex items-center gap-3 border-b border-slate-100 px-1 py-3 last:border-b-0 hover:bg-slate-50 transition-colors"
                   >
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-navy text-gold">
