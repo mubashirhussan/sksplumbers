@@ -16,6 +16,17 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'handymanmaintenance.ae',
+          },
+        ],
+        destination: 'https://www.handymanmaintenance.ae/:path*',
+        permanent: true,
+      },
+      {
         source: '/pages/:slug',
         destination: '/:slug',
         permanent: true,
