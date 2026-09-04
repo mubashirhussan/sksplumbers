@@ -1,4 +1,5 @@
 import { Inter, Montserrat } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 import { SITE_URL, DEFAULT_SEO } from "@/lib/site";
 
@@ -40,7 +41,19 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${heading.variable} ${body.variable} h-full overflow-x-hidden antialiased`}
     >
-      <body className="min-h-full flex flex-col overflow-x-hidden bg-white text-navy">{children}</body>
+      <GoogleTagManager gtmId="GTM-PRQD36QD" />
+      <body className="min-h-full flex flex-col overflow-x-hidden bg-white text-navy">
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PRQD36QD"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+            title="Google Tag Manager"
+          />
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }
