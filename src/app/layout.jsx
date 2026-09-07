@@ -22,6 +22,9 @@ export const metadata = {
   },
   description: DEFAULT_SEO.description,
   robots: { index: true, follow: true },
+  verification: {
+    google: "3FKwbT-R4JElOZg_ICF4-FG4I4SdnpF0TgP2ahxA6tc",
+  },
   openGraph: {
     type: "website",
     locale: "en_AE",
